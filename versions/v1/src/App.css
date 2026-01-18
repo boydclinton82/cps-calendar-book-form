@@ -1,0 +1,93 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.view-container {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+}
+
+.view-container.day {
+  justify-content: center;
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.view-container.week {
+  padding: 20px;
+}
+
+/* Transition between views */
+.view-container.day > * {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+.view-container.week > * {
+  animation: expandIn 0.4s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Panel overlay for mobile */
+.panel-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .panel-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Ensure proper spacing when panel is open */
+@media (min-width: 769px) {
+  .main-content:has(.booking-panel.open) .view-container.day {
+    margin-right: 340px;
+    transition: margin-right var(--transition-medium);
+  }
+}

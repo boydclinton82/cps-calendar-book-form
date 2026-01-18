@@ -1,0 +1,257 @@
+.week-view {
+  padding: 20px;
+  overflow-x: auto;
+  width: 100%;
+  flex: 1;
+  display: flex;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 6px;
+  width: 100%;
+  flex: 1;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 0 30px rgba(0, 229, 229, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Time column */
+.time-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-cell {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding-right: 12px;
+  text-align: right;
+  justify-content: flex-end;
+}
+
+/* Day columns */
+.day-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: slideInDay 0.4s ease-out;
+  animation-fill-mode: both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes slideInDay {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.day-column.current {
+  position: relative;
+}
+
+.day-column.current::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  background: var(--accent);
+  opacity: 0.08;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+/* Column header */
+.column-header {
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  transition: all var(--transition-fast);
+}
+
+button.column-header {
+  cursor: pointer;
+}
+
+button.column-header:hover {
+  background: rgba(0, 229, 229, 0.1);
+  border-color: var(--border-glow);
+}
+
+.column-header.today {
+  background: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.column-header.today .day-name,
+.column-header.today .day-date {
+  color: var(--bg-primary);
+}
+
+.day-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.day-date {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Week slot */
+.week-slot {
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px 2px;
+  overflow: hidden;
+}
+
+.week-slot.available {
+  background: rgba(21, 34, 56, 0.5);
+  border-color: rgba(0, 229, 229, 0.1);
+}
+
+.week-slot.available:hover {
+  border-color: var(--accent);
+  background: rgba(0, 229, 229, 0.15);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Booked state - others (red) */
+.week-slot.booked {
+  background: rgba(220, 38, 38, 0.4);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Booked state - own (green) */
+.week-slot.booked.own {
+  background: rgba(34, 197, 94, 0.4);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.week-slot.past {
+  background: rgba(30, 58, 95, 0.2);
+  opacity: 0.4;
+}
+
+/* Multi-hour unified booking blocks */
+/* Parent .day-column has gap: 6px, so we need -7px to overcome gap + 1px overlap */
+.week-slot.multi-hour {
+  margin-bottom: -7px;
+  position: relative;
+  z-index: 1;
+}
+
+.week-slot.booking-end {
+  margin-bottom: 0;
+  z-index: 0;
+}
+
+/* Border-radius manipulation for unified box */
+.week-slot.booking-start {
+  border-radius: 6px 6px 0 0;
+  border-bottom-width: 0;
+}
+
+.week-slot.booking-middle {
+  border-radius: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+
+.week-slot.booking-end {
+  border-radius: 0 0 6px 6px;
+  border-top-width: 0;
+}
+
+/* Ensure middle and end slots are fully visible */
+.week-slot.booking-middle,
+.week-slot.booking-end {
+  opacity: 1;
+}
+
+/* Booking label in week view */
+.week-booking-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Time column header placeholder */
+.time-column .column-header {
+  background: transparent;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .week-view {
+    padding: 12px;
+  }
+
+  .week-grid {
+    grid-template-columns: 60px repeat(7, 1fr);
+    padding: 12px;
+  }
+
+  .time-cell {
+    font-size: 0.65rem;
+    height: 28px;
+  }
+
+  .column-header {
+    height: 52px;
+  }
+
+  .day-name {
+    font-size: 0.6rem;
+  }
+
+  .day-date {
+    font-size: 0.9rem;
+  }
+
+  .week-slot {
+    height: 28px;
+  }
+
+  .week-booking-label {
+    font-size: 0.45rem;
+  }
+}

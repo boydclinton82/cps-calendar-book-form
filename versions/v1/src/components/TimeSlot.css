@@ -1,0 +1,139 @@
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  text-align: left;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Available state - muted, ready to be clicked */
+.time-slot.available {
+  cursor: pointer;
+  background: rgba(21, 34, 56, 0.6);
+  border-color: rgba(0, 229, 229, 0.15);
+}
+
+.time-slot.available:hover {
+  background: rgba(21, 34, 56, 0.9);
+  border-color: var(--accent);
+  box-shadow:
+    0 0 20px var(--accent-glow),
+    inset 0 0 20px rgba(0, 229, 229, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Selected state - bright cyan glow */
+.time-slot.selected {
+  background: rgba(0, 229, 229, 0.1);
+  border-color: var(--accent);
+  box-shadow:
+    0 0 24px var(--accent-glow-strong),
+    inset 0 0 24px rgba(0, 229, 229, 0.1);
+}
+
+/* Booked state */
+.time-slot.booked {
+  cursor: default;
+  background: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.4);
+}
+
+.time-slot.booked.own {
+  cursor: pointer;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.time-slot.booked.own:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+/* Continuation (blocked by multi-hour booking) */
+.time-slot.continuation {
+  opacity: 0.5;
+}
+
+.time-slot.continuation.own {
+  opacity: 0.6;
+}
+
+/* Past state */
+.time-slot.past {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: rgba(30, 58, 95, 0.3);
+  border-color: transparent;
+}
+
+/* Time label */
+.time-label {
+  min-width: 90px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.time-slot.available:hover .time-label,
+.time-slot.selected .time-label {
+  color: var(--accent);
+}
+
+/* Slot content */
+.slot-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.available-indicator {
+  display: none;
+}
+
+.booking-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.cancel-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.time-slot.booked.own:hover .cancel-hint {
+  opacity: 1;
+}
+
+.blocked-indicator {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Animation for booking confirmation */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--accent-glow-strong);
+  }
+}
+
+.time-slot.just-booked {
+  animation: glowPulse 0.6s ease-out;
+}
