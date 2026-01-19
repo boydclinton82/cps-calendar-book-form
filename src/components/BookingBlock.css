@@ -6,7 +6,8 @@
   padding: 12px 20px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   transition: all var(--transition-fast);
   z-index: 2;

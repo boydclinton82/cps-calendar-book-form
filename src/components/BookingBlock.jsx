@@ -5,6 +5,29 @@ import './BookingBlock.css';
 const SLOT_HEIGHT = 48;  // Approximate height of a TimeSlot
 const SLOT_GAP = 8;      // Gap from TimeStrip.css
 
+// Format hour to short time string (e.g., 17 -> "5 PM", 9 -> "9 AM", 12 -> "12 PM")
+function formatShortHour(hour) {
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+  return `${displayHour} ${period}`;
+}
+
+// Format time range (e.g., 17-19 -> "5-7 PM", 11-13 -> "11 AM-1 PM")
+function formatTimeRange(startHour, endHour) {
+  const startPeriod = startHour >= 12 ? 'PM' : 'AM';
+  const endPeriod = endHour >= 12 ? 'PM' : 'AM';
+  const startDisplay = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
+  const endDisplay = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
+
+  if (startPeriod === endPeriod) {
+    // Same period: "5-7 PM"
+    return `${startDisplay}-${endDisplay} ${endPeriod}`;
+  } else {
+    // Different periods: "11 AM-1 PM"
+    return `${startDisplay} ${startPeriod}-${endDisplay} ${endPeriod}`;
+  }
+}
+
 export function BookingBlock({
   booking,
   startHour,
@@ -83,7 +106,10 @@ export function BookingBlock({
     }
   };
 
-  const durationText = remainingDuration > 1 ? `(${remainingDuration}hr)` : '(1hr)';
+  // Calculate display time range (using effective start after clipping)
+  const displayStartHour = effectiveStartHour;
+  const displayEndHour = effectiveStartHour + remainingDuration;
+  const timeRangeText = formatTimeRange(displayStartHour, displayEndHour);
 
   return (
     <div
@@ -92,10 +118,10 @@ export function BookingBlock({
       onClick={handleClick}
       role="button"
       tabIndex={isOwn ? 0 : -1}
-      aria-label={`Booking by ${user} for ${remainingDuration} hour${remainingDuration > 1 ? 's' : ''}${isOwn ? ', click to cancel' : ''}`}
+      aria-label={`Booking by ${user} from ${formatShortHour(displayStartHour)} to ${formatShortHour(displayEndHour)}${isOwn ? ', click to cancel' : ''}`}
     >
       <span className="booking-block-info">
-        {user} {durationText}
+        {user} ({timeRangeText})
       </span>
       {isOwn && <span className="booking-block-cancel-hint">click to cancel</span>}
     </div>
