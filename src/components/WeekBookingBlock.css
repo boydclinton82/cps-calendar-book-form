@@ -1,0 +1,42 @@
+.week-booking-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px 2px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Other's bookings (red) */
+.week-booking-block.other {
+  background: rgba(220, 38, 38, 0.4);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+/* Own bookings (green) */
+.week-booking-block.own {
+  background: rgba(34, 197, 94, 0.4);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.week-booking-block-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .week-booking-block-label {
+    font-size: 0.45rem;
+  }
+}

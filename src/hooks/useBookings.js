@@ -49,101 +49,26 @@ export function useBookings() {
     });
   }, []);
 
+  // Simplified getSlotStatus - only returns status and booking info
+  // Position calculation is now handled by overlay components
   const getSlotStatus = useCallback((dateKey, timeKey, hour) => {
     const dayBookings = bookings[dateKey] || {};
-
-    // Helper to calculate effective position (accounting for past hours)
-    const calculateEffectivePosition = (bookingStartHour, duration) => {
-      const now = new Date();
-      const slotDate = new Date(dateKey + 'T00:00:00');
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      slotDate.setHours(0, 0, 0, 0);
-
-      let pastHoursCount = 0;
-
-      if (slotDate.getTime() < today.getTime()) {
-        // Past date - all hours are past
-        pastHoursCount = duration;
-      } else if (slotDate.getTime() === today.getTime()) {
-        // Today - count hours that have passed
-        const currentHour = now.getHours();
-        for (let i = 0; i < duration; i++) {
-          const checkHour = bookingStartHour + i;
-          if (checkHour < currentHour) {
-            pastHoursCount++;
-          }
-        }
-      }
-      // Future date - pastHoursCount stays 0
-
-      const remainingDuration = duration - pastHoursCount;
-      const firstNonPastPosition = pastHoursCount; // 0-indexed position of first non-past slot
-
-      return { pastHoursCount, remainingDuration, firstNonPastPosition };
-    };
 
     // Check if this slot has a direct booking
     if (dayBookings[timeKey]) {
       const booking = dayBookings[timeKey];
-      const duration = booking.duration || 1;
-      const isMultiHour = duration > 1;
-      const bookingStartHour = hour; // This is the start slot
-
-      const { pastHoursCount, remainingDuration, firstNonPastPosition } =
-        calculateEffectivePosition(bookingStartHour, duration);
-
-      // isEffectiveStart: this slot is the first non-past slot of the booking
-      // For the start slot, it's effective start only if no hours are past yet
-      const isEffectiveStart = pastHoursCount === 0;
-
       return {
         status: 'booked',
         booking,
-        isStart: true,
-        isEnd: duration === 1,
-        isMiddle: false,
-        duration,
-        positionInBooking: 0,
-        isMultiHour,
-        // New properties for dynamic styling
-        isEffectiveStart,
-        remainingDuration,
-        pastHoursCount,
-        bookingStartHour,
       };
     }
 
     // Check if this slot is blocked by a multi-hour booking
     const blockInfo = isSlotBlocked(dayBookings, hour);
     if (blockInfo.blocked) {
-      const duration = blockInfo.booking.duration || 1;
-      const bookingStartHour = blockInfo.bookingHour;
-      const positionInBooking = hour - bookingStartHour;
-      const isEnd = positionInBooking === duration - 1;
-      const isMiddle = !isEnd;
-
-      const { pastHoursCount, remainingDuration, firstNonPastPosition } =
-        calculateEffectivePosition(bookingStartHour, duration);
-
-      // isEffectiveStart: this slot is the first non-past slot of the booking
-      const isEffectiveStart = positionInBooking === firstNonPastPosition && remainingDuration > 0;
-
       return {
         status: 'blocked',
         booking: blockInfo.booking,
-        bookingHour: blockInfo.bookingHour,
-        isStart: false,
-        isEnd,
-        isMiddle,
-        duration,
-        positionInBooking,
-        isMultiHour: true,
-        // New properties for dynamic styling
-        isEffectiveStart,
-        remainingDuration,
-        pastHoursCount,
-        bookingStartHour,
       };
     }
 

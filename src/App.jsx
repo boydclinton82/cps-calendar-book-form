@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { TimeStrip } from './components/TimeStrip';
 import { BookingPanel } from './components/BookingPanel';
 import { WeekView } from './components/WeekView';
 import { useBookings } from './hooks/useBookings';
 import { useKeyboard } from './hooks/useKeyboard';
+import { useHourlyRefresh } from './hooks/useHourlyRefresh';
 import { addDays, formatDate, END_HOUR } from './utils/time';
 import './App.css';
 
@@ -13,25 +14,11 @@ function App() {
   const [isWeekView, setIsWeekView] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [, setTick] = useState(0); // Forces re-render on the hour
 
   const { bookings, createBooking, removeBooking, getSlotStatus, canBook } = useBookings();
 
   // Auto-refresh on the hour to update past slots
-  useEffect(() => {
-    const scheduleHourlyRefresh = () => {
-      const now = new Date();
-      const msUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds();
-
-      return setTimeout(() => {
-        setTick(t => t + 1); // Force re-render
-        scheduleHourlyRefresh(); // Schedule next hour
-      }, msUntilNextHour);
-    };
-
-    const timeoutId = scheduleHourlyRefresh();
-    return () => clearTimeout(timeoutId);
-  }, []);
+  useHourlyRefresh();
 
   // Navigation
   const handleNavigate = useCallback((direction) => {

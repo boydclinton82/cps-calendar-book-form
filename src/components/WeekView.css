@@ -76,6 +76,15 @@
   pointer-events: none;
 }
 
+/* Slots container for overlay positioning */
+.day-column .slots-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
 /* Column header */
 .column-header {
   height: 60px;
@@ -130,11 +139,6 @@ button.column-header:hover {
   border: 1px solid transparent;
   transition: all var(--transition-fast);
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 4px 2px;
-  overflow: hidden;
 }
 
 .week-slot.available {
@@ -148,70 +152,15 @@ button.column-header:hover {
   box-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* Booked state - others (red) */
-.week-slot.booked {
-  background: rgba(220, 38, 38, 0.4);
-  border-color: rgba(220, 38, 38, 0.3);
-}
-
-/* Booked state - own (green) */
-.week-slot.booked.own {
-  background: rgba(34, 197, 94, 0.4);
-  border-color: rgba(34, 197, 94, 0.3);
+/* Occupied state - transparent, overlay shows the booking */
+.week-slot.occupied {
+  background: transparent;
+  border-color: transparent;
 }
 
 .week-slot.past {
   background: rgba(30, 58, 95, 0.2);
   opacity: 0.4;
-}
-
-/* Multi-hour unified booking blocks */
-/* Parent .day-column has gap: 6px, so we need -7px to overcome gap + 1px overlap */
-.week-slot.multi-hour {
-  margin-bottom: -7px;
-  position: relative;
-  z-index: 1;
-}
-
-.week-slot.booking-end {
-  margin-bottom: 0;
-  z-index: 0;
-}
-
-/* Border-radius manipulation for unified box */
-.week-slot.booking-start {
-  border-radius: 6px 6px 0 0;
-  border-bottom-width: 0;
-}
-
-.week-slot.booking-middle {
-  border-radius: 0;
-  border-top-width: 0;
-  border-bottom-width: 0;
-}
-
-.week-slot.booking-end {
-  border-radius: 0 0 6px 6px;
-  border-top-width: 0;
-}
-
-/* Ensure middle and end slots are fully visible */
-.week-slot.booking-middle,
-.week-slot.booking-end {
-  opacity: 1;
-}
-
-/* Booking label in week view */
-.week-booking-label {
-  font-size: 0.55rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-align: center;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 /* Time column header placeholder */
@@ -249,9 +198,5 @@ button.column-header:hover {
 
   .week-slot {
     height: 28px;
-  }
-
-  .week-booking-label {
-    font-size: 0.45rem;
   }
 }

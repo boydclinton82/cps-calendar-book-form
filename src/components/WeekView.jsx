@@ -1,4 +1,5 @@
 import { getWeekDays, getStartOfWeek, formatDate, formatShortDate, generateTimeSlots, isToday, isSlotPast } from '../utils/time';
+import { WeekDayOverlay } from './WeekDayOverlay';
 import './WeekView.css';
 
 const TIME_SLOTS = generateTimeSlots();
@@ -14,29 +15,14 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
 
     const classes = ['week-slot'];
     const isBooked = slotStatus.status === 'booked' || slotStatus.status === 'blocked';
-    const isOwnBooking = slotStatus.booking?.user === currentUser;
 
     if (isPast) {
       classes.push('past');
     } else if (isBooked) {
-      classes.push('booked');
-      if (isOwnBooking) {
-        classes.push('own');
-      }
+      // Occupied slots are transparent - overlay shows the booking
+      classes.push('occupied');
     } else {
       classes.push('available');
-    }
-
-    // Add position classes for multi-hour bookings
-    if (slotStatus.isMultiHour && !isPast) {
-      classes.push('multi-hour');
-      if (slotStatus.isEffectiveStart) {
-        classes.push('booking-start');
-      } else if (slotStatus.isEnd) {
-        classes.push('booking-end');
-      } else {
-        classes.push('booking-middle');
-      }
     }
 
     return classes.join(' ');
@@ -55,26 +41,6 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
     return `${slot.time}: Available`;
   };
 
-  const getSlotContent = (date, slot) => {
-    const dateKey = formatDate(date);
-    const slotStatus = getSlotStatus(dateKey, slot.key, slot.hour);
-    const isPast = isSlotPast(date, slot.hour);
-
-    // Show label on the effective start slot (first non-past slot of a booking)
-    const isBooked = slotStatus.status === 'booked' || slotStatus.status === 'blocked';
-    if (!isPast && isBooked && slotStatus.isEffectiveStart) {
-      // Show remaining duration (hours left that aren't past)
-      const displayDuration = slotStatus.remainingDuration ?? slotStatus.duration ?? 1;
-      const hourText = displayDuration === 1 ? 'hr' : 'hrs';
-      return (
-        <span className="week-booking-label">
-          {slotStatus.booking.user} {displayDuration}{hourText}
-        </span>
-      );
-    }
-    return null;
-  };
-
   return (
     <div className="week-view">
       <div className="week-grid">
@@ -90,12 +56,14 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
 
         {/* Day columns */}
         {weekDays.map((day, index) => {
-          const isCurrentDay = formatDate(day) === formatDate(currentDate);
+          const dateKey = formatDate(day);
+          const dayBookings = bookings[dateKey] || {};
+          const isCurrentDay = dateKey === formatDate(currentDate);
           const isTodayDay = isToday(day);
 
           return (
             <div
-              key={formatDate(day)}
+              key={dateKey}
               className={`day-column ${isCurrentDay ? 'current' : ''}`}
               style={{ '--delay': `${index * 50}ms` }}
             >
@@ -107,16 +75,21 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
                 <span className="day-date mono">{day.getDate()}</span>
               </button>
 
-              {/* Week View keeps all slots for grid alignment; past slots are styled differently */}
-              {TIME_SLOTS.map((slot) => (
-                <div
-                  key={slot.key}
-                  className={getSlotClass(day, slot)}
-                  title={getSlotTitle(day, slot)}
-                >
-                  {getSlotContent(day, slot)}
-                </div>
-              ))}
+              {/* Slots container with overlay */}
+              <div className="slots-container">
+                {TIME_SLOTS.map((slot) => (
+                  <div
+                    key={slot.key}
+                    className={getSlotClass(day, slot)}
+                    title={getSlotTitle(day, slot)}
+                  />
+                ))}
+                <WeekDayOverlay
+                  dayBookings={dayBookings}
+                  date={day}
+                  currentUser={currentUser}
+                />
+              </div>
             </div>
           );
         })}

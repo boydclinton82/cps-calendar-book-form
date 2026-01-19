@@ -1,8 +1,5 @@
 /* Glass container for time slots (matching reference - darker interior) */
 .time-strip {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   padding: 20px;
   width: 380px;
   min-width: 380px;
@@ -16,6 +13,14 @@
     0 0 40px rgba(0, 229, 229, 0.08),
     0 8px 32px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Container for slots with overlay positioning */
+.time-strip .slots-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @media (max-width: 600px) {

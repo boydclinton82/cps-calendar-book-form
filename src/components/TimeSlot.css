@@ -1,9 +1,11 @@
 .time-slot {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
   width: 100%;
-  padding: 12px 20px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 20px;
   background: rgba(15, 25, 45, 0.5);
   border: 1px solid rgba(0, 229, 229, 0.2);
   border-radius: 10px;
@@ -13,7 +15,7 @@
   overflow: hidden;
 }
 
-/* Available state - visible cyan border with glow (matching reference) */
+/* Available state - visible cyan border with glow */
 .time-slot.available {
   cursor: pointer;
   background: rgba(15, 25, 45, 0.7);
@@ -22,18 +24,6 @@
   box-shadow:
     0 0 8px rgba(0, 229, 229, 0.3),
     inset 0 0 12px rgba(0, 229, 229, 0.05);
-  /* Center the time label for available slots */
-  justify-content: center;
-}
-
-/* Hide empty slot-content for available slots to allow centering */
-.time-slot.available .slot-content {
-  display: none;
-}
-
-/* Remove min-width constraint for available slots so time can center */
-.time-slot.available .time-label {
-  min-width: unset;
 }
 
 .time-slot.available:hover {
@@ -46,7 +36,7 @@
   transform: translateY(-1px);
 }
 
-/* Selected state - intense cyan glow (matching reference) */
+/* Selected state - intense cyan glow */
 .time-slot.selected {
   background: rgba(0, 229, 229, 0.15);
   border-color: var(--accent);
@@ -58,85 +48,24 @@
     inset 0 0 30px rgba(0, 229, 229, 0.1);
 }
 
-/* Booked state */
-.time-slot.booked {
+/* Occupied state - transparent, overlay shows the booking */
+.time-slot.occupied {
   cursor: default;
-  background: rgba(220, 38, 38, 0.15);
-  border-color: rgba(220, 38, 38, 0.4);
+  background: transparent;
+  border-color: transparent;
+  pointer-events: none;
 }
 
-.time-slot.booked.own {
-  cursor: pointer;
-  background: rgba(34, 197, 94, 0.15);
-  border-color: rgba(34, 197, 94, 0.4);
-}
-
-.time-slot.booked.own:hover {
-  background: rgba(34, 197, 94, 0.25);
-  border-color: rgba(34, 197, 94, 0.6);
-}
-
-/* Multi-hour booking: unified box styling */
-/* Parent .time-strip has gap: 8px, so we need -9px to overcome gap + 1px overlap */
-.time-slot.multi-hour {
-  margin-bottom: -9px;
-  position: relative;
-  z-index: 1;
-}
-
-.time-slot.booking-end {
-  margin-bottom: 0;
-  z-index: 0;
-}
-
-/* Border-radius manipulation for unified box */
-.time-slot.booking-start {
-  border-radius: 10px 10px 0 0;
-  border-bottom-width: 0;
-}
-
-.time-slot.booking-middle {
-  border-radius: 0;
-  border-top-width: 0;
-  border-bottom-width: 0;
-}
-
-.time-slot.booking-end {
-  border-radius: 0 0 10px 10px;
-  border-top-width: 0;
-}
-
-/* Ensure middle and end slots are fully visible (no opacity reduction) */
-.time-slot.booking-middle,
-.time-slot.booking-end {
-  opacity: 1;
-}
-
-/* Booking info stays at top of unified block - no centering transform needed */
-
-/* Past state - slots from past dates */
+/* Past state */
 .time-slot.past {
   opacity: 0.35;
   cursor: not-allowed;
   background: rgba(30, 58, 95, 0.3);
   border-color: transparent;
-  /* Center the time label for past slots (same as available) */
-  justify-content: center;
-}
-
-/* Hide slot-content for past slots to allow centering */
-.time-slot.past .slot-content {
-  display: none;
-}
-
-/* Remove min-width constraint for past empty slots so time can center */
-.time-slot.past .time-label {
-  min-width: unset;
 }
 
 /* Time label */
 .time-label {
-  min-width: 80px;
   font-size: 0.875rem;
   font-weight: 500;
   color: rgba(140, 170, 200, 0.9);
@@ -153,41 +82,9 @@
   text-shadow: 0 0 10px rgba(0, 229, 229, 0.5);
 }
 
-/* Slot content */
-.slot-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.available-indicator {
-  display: none;
-}
-
-.booking-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.cancel-hint {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.time-slot.booked.own:hover .cancel-hint {
-  opacity: 1;
-}
-
-/* Blocked indicator - hidden in unified box design */
-.blocked-indicator {
-  display: none;
+/* Hide time label for occupied slots - overlay shows everything */
+.time-slot.occupied .time-label {
+  visibility: hidden;
 }
 
 /* Animation for booking confirmation */
