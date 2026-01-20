@@ -6,6 +6,7 @@ export function BookingOverlay({
   date,
   currentUser,
   onCancel,
+  onBookingClick,
 }) {
   // dayBookings is an object: { "07:00": { user: "Jack", duration: 2 }, ... }
   const bookingEntries = Object.entries(dayBookings || {});
@@ -26,6 +27,7 @@ export function BookingOverlay({
             date={date}
             currentUser={currentUser}
             onCancel={() => onCancel?.(timeKey)}
+            onClick={() => onBookingClick?.(timeKey, booking)}
           />
         );
       })}

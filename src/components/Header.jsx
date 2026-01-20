@@ -19,7 +19,7 @@ export function Header({ currentDate, onNavigate, onWeekToggle, isWeekView }) {
         <button
           className="nav-btn"
           onClick={() => onNavigate(-1)}
-          aria-label="Previous day"
+          aria-label={isWeekView ? "Previous week" : "Previous day"}
         >
           <span className="mono">&larr;</span>
         </button>
@@ -32,20 +32,12 @@ export function Header({ currentDate, onNavigate, onWeekToggle, isWeekView }) {
         <button
           className="nav-btn"
           onClick={() => onNavigate(1)}
-          aria-label="Next day"
+          aria-label={isWeekView ? "Next week" : "Next day"}
         >
           <span className="mono">&rarr;</span>
         </button>
       </div>
 
-      <div className="header-hints mono">
-        <span className="hint"><kbd>J</kbd> Jack</span>
-        <span className="hint"><kbd>B</kbd> Bonnie</span>
-        <span className="hint-separator">|</span>
-        <span className="hint"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Duration</span>
-        <span className="hint-separator">|</span>
-        <span className="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd> Navigate</span>
-      </div>
     </header>
   );
 }

@@ -1,5 +1,5 @@
 .header {
-  padding: 24px 32px;
+  padding: 16px 32px;
   background: transparent;
 }
 
@@ -7,7 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .header-title {
@@ -68,7 +68,7 @@
   align-items: center;
   justify-content: center;
   gap: 28px;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 .nav-btn {

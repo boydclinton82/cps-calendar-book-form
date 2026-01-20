@@ -87,7 +87,7 @@ export function isSlotBlocked(bookings, hour) {
     const bookingHour = parseInt(timeKey.split(':')[0], 10);
     const duration = booking.duration || 1;
     if (hour > bookingHour && hour < bookingHour + duration) {
-      return { blocked: true, booking, bookingHour };
+      return { blocked: true, booking, bookingHour, startKey: timeKey };
     }
   }
   return { blocked: false };

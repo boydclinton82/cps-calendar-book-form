@@ -13,23 +13,49 @@
   z-index: 2;
 }
 
-/* Other's bookings (red) */
+/* Other's bookings (red glow) */
 .booking-block.other {
-  background: rgba(220, 38, 38, 0.15);
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.5);
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.25),
+    inset 0 0 12px rgba(220, 38, 38, 0.05);
   cursor: default;
 }
 
-/* Own bookings (green) - clickable */
+.booking-block.other .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--booked-other-color);
+  text-shadow: 0 0 6px rgba(220, 38, 38, 0.3);
+}
+
+/* Own bookings (green glow) - clickable */
 .booking-block.own {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  box-shadow:
+    0 0 8px rgba(34, 197, 94, 0.3),
+    inset 0 0 12px rgba(34, 197, 94, 0.05);
   cursor: pointer;
 }
 
+.booking-block.own .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--booked-own-color);
+}
+
 .booking-block.own:hover {
-  background: rgba(34, 197, 94, 0.25);
-  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow:
+    0 0 16px rgba(34, 197, 94, 0.5),
+    0 0 32px rgba(34, 197, 94, 0.2),
+    inset 0 0 20px rgba(34, 197, 94, 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.own:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
 .booking-block.own:focus {
@@ -40,16 +66,20 @@
 .booking-block-info {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-primary);
+  transition: text-shadow var(--transition-fast);
 }
 
 .booking-block-cancel-hint {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--text-secondary);
   opacity: 0;
   transition: opacity var(--transition-fast);
-  margin-top: 4px;
+  text-align: center;
 }
 
 .booking-block.own:hover .booking-block-cancel-hint {

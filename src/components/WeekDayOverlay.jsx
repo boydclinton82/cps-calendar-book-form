@@ -5,6 +5,7 @@ export function WeekDayOverlay({
   dayBookings,
   date,
   currentUser,
+  onBookingClick,
 }) {
   // dayBookings is an object: { "07:00": { user: "Jack", duration: 2 }, ... }
   const bookingEntries = Object.entries(dayBookings || {});
@@ -24,6 +25,7 @@ export function WeekDayOverlay({
             startHour={startHour}
             date={date}
             currentUser={currentUser}
+            onClick={() => onBookingClick?.(timeKey, booking)}
           />
         );
       })}

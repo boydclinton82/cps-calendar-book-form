@@ -7,7 +7,7 @@
   pointer-events: none;
 }
 
-/* Week blocks don't need interaction - clicking day header navigates */
+/* Enable clicks on booking blocks for editing */
 .week-day-overlay .week-booking-block {
-  pointer-events: none;
+  pointer-events: auto;
 }

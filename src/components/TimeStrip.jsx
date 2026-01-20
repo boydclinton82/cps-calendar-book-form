@@ -10,8 +10,10 @@ export function TimeStrip({
   bookings,
   getSlotStatus,
   selectedSlot,
+  focusedSlotIndex,
   onSlotSelect,
   onSlotCancel,
+  onBookingClick,
   currentUser,
 }) {
   const dateKey = formatDate(date);
@@ -26,12 +28,17 @@ export function TimeStrip({
     onSlotCancel?.(dateKey, timeKey);
   };
 
+  const handleBookingClick = (timeKey, booking) => {
+    onBookingClick?.(dateKey, timeKey, booking);
+  };
+
   return (
     <div className="time-strip">
       <div className="slots-container">
-        {visibleSlots.map((slot) => {
+        {visibleSlots.map((slot, index) => {
           const slotStatus = getSlotStatus(dateKey, slot.key, slot.hour);
           const isSelected = selectedSlot?.timeKey === slot.key;
+          const isFocused = focusedSlotIndex === index;
 
           return (
             <TimeSlot
@@ -43,6 +50,7 @@ export function TimeStrip({
               slotStatus={slotStatus}
               currentUser={currentUser}
               isSelected={isSelected}
+              isFocused={isFocused}
               onClick={() => onSlotSelect?.({ ...slot, dateKey })}
             />
           );
@@ -52,6 +60,7 @@ export function TimeStrip({
           date={date}
           currentUser={currentUser}
           onCancel={handleOverlayCancel}
+          onBookingClick={handleBookingClick}
         />
       </div>
     </div>

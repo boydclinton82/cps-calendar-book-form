@@ -49,6 +49,20 @@ export function useBookings() {
     });
   }, []);
 
+  const updateBooking = useCallback((date, time, updates) => {
+    setBookings((prev) => {
+      const newBookings = { ...prev };
+      if (newBookings[date] && newBookings[date][time]) {
+        newBookings[date] = {
+          ...newBookings[date],
+          [time]: { ...newBookings[date][time], ...updates },
+        };
+        saveBookings(newBookings);
+      }
+      return newBookings;
+    });
+  }, []);
+
   // Simplified getSlotStatus - only returns status and booking info
   // Position calculation is now handled by overlay components
   const getSlotStatus = useCallback((dateKey, timeKey, hour) => {
@@ -98,12 +112,44 @@ export function useBookings() {
     return true;
   }, [bookings]);
 
+  // Check if duration can be changed for an existing booking
+  // Excludes the current booking's slots from conflict check
+  const canChangeDuration = useCallback((date, timeKey, hour, currentDuration, newDuration) => {
+    const dayBookings = bookings[date] || {};
+
+    // Check all slots that would be occupied by new duration
+    for (let i = 0; i < newDuration; i++) {
+      const checkHour = hour + i;
+      const checkKey = `${checkHour.toString().padStart(2, '0')}:00`;
+
+      // Skip slots that are part of current booking
+      if (i < currentDuration) {
+        continue;
+      }
+
+      // Check if slot is already booked by another booking
+      if (dayBookings[checkKey]) {
+        return false;
+      }
+
+      // Check if slot is blocked by another booking (not by current booking)
+      const blockInfo = isSlotBlocked(dayBookings, checkHour);
+      if (blockInfo.blocked && blockInfo.startKey !== timeKey) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [bookings]);
+
   return {
     bookings,
     getBookingsForDate,
     createBooking,
     removeBooking,
+    updateBooking,
     getSlotStatus,
     canBook,
+    canChangeDuration,
   };
 }

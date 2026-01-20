@@ -12,11 +12,23 @@ export const DURATIONS = [
 ];
 
 export function useKeyboard({
+  // Popup mode (edit existing booking)
+  onPopupUserSelect,
+  onPopupDurationSelect,
+  onPopupDelete,
+  onPopupClose,
+  canPopupChangeDuration,
+  // Panel mode (create new booking)
   onUserSelect,
   onDurationSelect,
   onCancel,
+  // General navigation
   onWeekToggle,
   onNavigate,
+  onSlotFocusUp,
+  onSlotFocusDown,
+  onSlotSelect,
+  isWeekView = false,
   enabled = true,
 }) {
   const handleKeyDown = useCallback((e) => {
@@ -29,6 +41,52 @@ export function useKeyboard({
 
     const key = e.key.toLowerCase();
 
+    // POPUP MODE (edit existing booking)
+    if (onPopupClose || onPopupDelete || onPopupUserSelect || onPopupDurationSelect) {
+      // Delete: D key
+      if (key === 'd' && onPopupDelete) {
+        e.preventDefault();
+        onPopupDelete();
+        return;
+      }
+
+      // Close popup: Escape
+      if (e.key === 'Escape' && onPopupClose) {
+        e.preventDefault();
+        onPopupClose();
+        return;
+      }
+
+      // Confirm and close popup: Enter
+      if (e.key === 'Enter' && onPopupClose) {
+        e.preventDefault();
+        onPopupClose();
+        return;
+      }
+
+      // User selection in popup: J or B
+      const user = USERS.find((u) => u.key === key);
+      if (user && onPopupUserSelect) {
+        e.preventDefault();
+        onPopupUserSelect(user.name);
+        return;
+      }
+
+      // Duration selection in popup: 1, 2, or 3
+      const duration = DURATIONS.find((d) => d.key === key);
+      if (duration && onPopupDurationSelect && canPopupChangeDuration) {
+        if (canPopupChangeDuration(duration.value)) {
+          e.preventDefault();
+          onPopupDurationSelect(duration.value);
+        }
+        return;
+      }
+
+      // Block other keys while popup is open
+      return;
+    }
+
+    // PANEL MODE (create new booking)
     // User selection: J or B
     const user = USERS.find((u) => u.key === key);
     if (user && onUserSelect) {
@@ -59,20 +117,39 @@ export function useKeyboard({
       return;
     }
 
-    // Navigation: Arrow keys
+    // Slot focus navigation: Up/Down arrows (day view only)
+    if (e.key === 'ArrowUp' && onSlotFocusUp) {
+      e.preventDefault();
+      onSlotFocusUp();
+      return;
+    }
+    if (e.key === 'ArrowDown' && onSlotFocusDown) {
+      e.preventDefault();
+      onSlotFocusDown();
+      return;
+    }
+
+    // Select focused slot: Enter
+    if (e.key === 'Enter' && onSlotSelect) {
+      e.preventDefault();
+      onSlotSelect();
+      return;
+    }
+
+    // Navigation: Left/Right arrows (week navigation moves by 7 days)
     if (onNavigate) {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        onNavigate(-1);
+        onNavigate(isWeekView ? -7 : -1);
         return;
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
-        onNavigate(1);
+        onNavigate(isWeekView ? 7 : 1);
         return;
       }
     }
-  }, [enabled, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onNavigate]);
+  }, [enabled, onPopupUserSelect, onPopupDurationSelect, onPopupDelete, onPopupClose, canPopupChangeDuration, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onNavigate, onSlotFocusUp, onSlotFocusDown, onSlotSelect, isWeekView]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

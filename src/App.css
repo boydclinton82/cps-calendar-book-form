@@ -5,25 +5,24 @@
 }
 
 .main-content {
-  flex: 1;
   display: flex;
   position: relative;
 }
 
 .view-container {
-  flex: 1;
   display: flex;
   overflow: auto;
+  width: 100%;
 }
 
 .view-container.day {
   justify-content: center;
-  padding-top: 32px;
-  padding-bottom: 32px;
+  padding-top: 12px;
+  padding-bottom: 8px;
 }
 
 .view-container.week {
-  padding: 20px;
+  padding: 8px;
   width: 100%;
 }
 

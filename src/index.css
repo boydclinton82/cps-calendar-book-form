@@ -18,6 +18,16 @@
   --booked-own: #3b82f6;
   --past: #1e3a5f;
 
+  /* Booked - Own (Green) */
+  --booked-own-color: rgb(34, 197, 94);
+  --booked-own-glow: rgba(34, 197, 94, 0.4);
+  --booked-own-glow-strong: rgba(34, 197, 94, 0.6);
+
+  /* Booked - Other (Red) */
+  --booked-other-color: rgb(220, 38, 38);
+  --booked-other-glow: rgba(220, 38, 38, 0.4);
+  --booked-other-glow-strong: rgba(220, 38, 38, 0.6);
+
   /* Text colors */
   --text-primary: #f0f6fc;
   --text-secondary: #7d8fa3;

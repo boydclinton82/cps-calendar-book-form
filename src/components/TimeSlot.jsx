@@ -8,6 +8,7 @@ export function TimeSlot({
   date,
   slotStatus,
   isSelected,
+  isFocused,
   onClick,
 }) {
   const isPast = isSlotPast(date, hour);
@@ -31,6 +32,11 @@ export function TimeSlot({
 
     if (isSelected) {
       classes.push('selected');
+    }
+
+    // Keyboard focus highlight (only for available slots)
+    if (isFocused && !isPast && !isOccupied) {
+      classes.push('keyboard-focused');
     }
 
     return classes.join(' ');

@@ -4,7 +4,7 @@ import './WeekView.css';
 
 const TIME_SLOTS = generateTimeSlots();
 
-export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, currentUser }) {
+export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, onSlotSelect, onBookingClick, currentUser }) {
   const weekStart = getStartOfWeek(currentDate);
   const weekDays = getWeekDays(weekStart);
 
@@ -22,10 +22,28 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
       // Occupied slots are transparent - overlay shows the booking
       classes.push('occupied');
     } else {
-      classes.push('available');
+      classes.push('available', 'clickable');
     }
 
     return classes.join(' ');
+  };
+
+  const handleSlotClick = (day, slot) => {
+    const dateKey = formatDate(day);
+    const slotStatus = getSlotStatus(dateKey, slot.key, slot.hour);
+    const isPast = isSlotPast(day, slot.hour);
+
+    // Don't allow clicking on past or booked slots (bookings handled by overlay)
+    if (isPast || slotStatus.status === 'booked' || slotStatus.status === 'blocked') {
+      return;
+    }
+
+    // Select this slot for booking
+    onSlotSelect?.({ ...slot, dateKey });
+  };
+
+  const handleBookingClickWrapper = (dateKey, timeKey, booking) => {
+    onBookingClick?.(dateKey, timeKey, booking);
   };
 
   const getSlotTitle = (date, slot) => {
@@ -82,12 +100,14 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, cu
                     key={slot.key}
                     className={getSlotClass(day, slot)}
                     title={getSlotTitle(day, slot)}
+                    onClick={() => handleSlotClick(day, slot)}
                   />
                 ))}
                 <WeekDayOverlay
                   dayBookings={dayBookings}
                   date={day}
                   currentUser={currentUser}
+                  onBookingClick={(timeKey, booking) => handleBookingClickWrapper(dateKey, timeKey, booking)}
                 />
               </div>
             </div>

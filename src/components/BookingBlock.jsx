@@ -2,8 +2,8 @@ import { isSlotPast, START_HOUR } from '../utils/time';
 import './BookingBlock.css';
 
 // Layout constants for Day View - must match TimeStrip/TimeSlot CSS
-const SLOT_HEIGHT = 48;  // Approximate height of a TimeSlot
-const SLOT_GAP = 8;      // Gap from TimeStrip.css
+const SLOT_HEIGHT = 36;  // Approximate height of a TimeSlot
+const SLOT_GAP = 6;      // Gap from TimeStrip.css
 
 // Format hour to short time string (e.g., 17 -> "5 PM", 9 -> "9 AM", 12 -> "12 PM")
 function formatShortHour(hour) {
@@ -34,6 +34,7 @@ export function BookingBlock({
   date,
   currentUser,
   onCancel,
+  onClick,
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -101,8 +102,8 @@ export function BookingBlock({
   const height = remainingDuration * effectiveSlotHeight - SLOT_GAP;
 
   const handleClick = () => {
-    if (isOwn && onCancel) {
-      onCancel();
+    if (onClick) {
+      onClick();
     }
   };
 
@@ -117,13 +118,13 @@ export function BookingBlock({
       style={{ top: `${top}px`, height: `${height}px` }}
       onClick={handleClick}
       role="button"
-      tabIndex={isOwn ? 0 : -1}
-      aria-label={`Booking by ${user} from ${formatShortHour(displayStartHour)} to ${formatShortHour(displayEndHour)}${isOwn ? ', click to cancel' : ''}`}
+      tabIndex={0}
+      aria-label={`Booking by ${user} from ${formatShortHour(displayStartHour)} to ${formatShortHour(displayEndHour)}, click to edit`}
     >
       <span className="booking-block-info">
         {user} ({timeRangeText})
       </span>
-      {isOwn && <span className="booking-block-cancel-hint">click to cancel</span>}
+      <span className="booking-block-cancel-hint">click to edit</span>
     </div>
   );
 }

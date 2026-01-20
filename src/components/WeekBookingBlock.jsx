@@ -2,14 +2,29 @@ import { START_HOUR } from '../utils/time';
 import './WeekBookingBlock.css';
 
 // Layout constants for Week View - must match WeekView.css
-const SLOT_HEIGHT = 36;
-const SLOT_GAP = 6;
+const SLOT_HEIGHT = 30;
+const SLOT_GAP = 4;
+
+// Format time range (e.g., 17-19 -> "5-7 PM", 11-13 -> "11 AM-1 PM")
+function formatTimeRange(startHour, endHour) {
+  const startPeriod = startHour >= 12 ? 'PM' : 'AM';
+  const endPeriod = endHour >= 12 ? 'PM' : 'AM';
+  const startDisplay = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
+  const endDisplay = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
+
+  if (startPeriod === endPeriod) {
+    return `${startDisplay}-${endDisplay} ${endPeriod}`;
+  } else {
+    return `${startDisplay} ${startPeriod}-${endDisplay} ${endPeriod}`;
+  }
+}
 
 export function WeekBookingBlock({
   booking,
   startHour,
   date,
   currentUser,
+  onClick,
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -58,16 +73,27 @@ export function WeekBookingBlock({
   const top = slotIndex * effectiveSlotHeight;
   const height = remainingDuration * effectiveSlotHeight - SLOT_GAP;
 
-  const hourText = remainingDuration === 1 ? 'hr' : 'hrs';
+  // Calculate display time range
+  const endHour = effectiveStartHour + remainingDuration;
+  const timeRangeText = formatTimeRange(effectiveStartHour, endHour);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
     <div
       className={`week-booking-block ${isOwn ? 'own' : 'other'}`}
       style={{ top: `${top}px`, height: `${height}px` }}
-      title={`${user} (${remainingDuration}${hourText})`}
+      title={`${user} (${timeRangeText}) - click to edit`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
     >
       <span className="week-booking-block-label">
-        {user} {remainingDuration}{hourText}
+        {user} ({timeRangeText})
       </span>
     </div>
   );
