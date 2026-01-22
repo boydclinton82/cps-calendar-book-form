@@ -4,6 +4,8 @@
   right: 0;
   width: 340px;
   height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

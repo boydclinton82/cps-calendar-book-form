@@ -1,4 +1,5 @@
-import { USERS, DURATIONS } from '../hooks/useKeyboard';
+import { useEffect } from 'react';
+import { DURATIONS } from '../hooks/useKeyboard';
 import './BookingPopup.css';
 
 export function BookingPopup({
@@ -9,7 +10,20 @@ export function BookingPopup({
   onDelete,
   onClose,
   canChangeDuration,
+  users = [],  // Accept users from config
 }) {
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!isOpen || !booking) {
     return null;
   }
@@ -33,7 +47,7 @@ export function BookingPopup({
         <div className="popup-section">
           <h3 className="section-title">Who?</h3>
           <div className="option-group">
-            {USERS.map((user) => (
+            {users.map((user) => (
               <button
                 key={user.key}
                 className={`option-btn ${booking.user === user.name ? 'selected' : ''}`}

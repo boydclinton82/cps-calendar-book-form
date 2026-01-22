@@ -1,4 +1,5 @@
 import { isSlotPast, START_HOUR } from '../utils/time';
+import { getUserColorClass } from '../utils/colors';
 import './BookingBlock.css';
 
 // Layout constants for Day View - must match TimeStrip/TimeSlot CSS
@@ -35,6 +36,7 @@ export function BookingBlock({
   currentUser,
   onCancel,
   onClick,
+  users = [],  // Accept users from config
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -112,9 +114,12 @@ export function BookingBlock({
   const displayEndHour = effectiveStartHour + remainingDuration;
   const timeRangeText = formatTimeRange(displayStartHour, displayEndHour);
 
+  // Generate position-based user class (user-1 through user-6)
+  const userClass = getUserColorClass(user, users);
+
   return (
     <div
-      className={`booking-block ${isOwn ? 'own' : 'other'}`}
+      className={`booking-block ${userClass}`}
       style={{ top: `${top}px`, height: `${height}px` }}
       onClick={handleClick}
       role="button"

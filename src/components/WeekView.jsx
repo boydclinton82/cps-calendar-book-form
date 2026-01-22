@@ -4,7 +4,7 @@ import './WeekView.css';
 
 const TIME_SLOTS = generateTimeSlots();
 
-export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, onSlotSelect, onBookingClick, currentUser }) {
+export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, onSlotSelect, onBookingClick, currentUser, users = [] }) {
   const weekStart = getStartOfWeek(currentDate);
   const weekDays = getWeekDays(weekStart);
 
@@ -108,6 +108,7 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, on
                   date={day}
                   currentUser={currentUser}
                   onBookingClick={(timeKey, booking) => handleBookingClickWrapper(dateKey, timeKey, booking)}
+                  users={users}
                 />
               </div>
             </div>

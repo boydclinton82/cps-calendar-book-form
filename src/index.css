@@ -18,15 +18,31 @@
   --booked-own: #3b82f6;
   --past: #1e3a5f;
 
-  /* Booked - Own (Green) */
-  --booked-own-color: rgb(34, 197, 94);
-  --booked-own-glow: rgba(34, 197, 94, 0.4);
-  --booked-own-glow-strong: rgba(34, 197, 94, 0.6);
+  /* User Colors - Position-based (supports up to 6 users with any names) */
 
-  /* Booked - Other (Red) */
-  --booked-other-color: rgb(220, 38, 38);
-  --booked-other-glow: rgba(220, 38, 38, 0.4);
-  --booked-other-glow-strong: rgba(220, 38, 38, 0.6);
+  /* Position 1 - Bright Green */
+  --user-1-color: #4ADE80;
+  --user-1-rgb: 74, 222, 128;
+
+  /* Position 2 - Magenta/Pink */
+  --user-2-color: #E040FB;
+  --user-2-rgb: 224, 64, 251;
+
+  /* Position 3 - Gold/Amber */
+  --user-3-color: #FFB300;
+  --user-3-rgb: 255, 179, 0;
+
+  /* Position 4 - Purple */
+  --user-4-color: #8B5CF6;
+  --user-4-rgb: 139, 92, 246;
+
+  /* Position 5 - Coral */
+  --user-5-color: #FF6B6B;
+  --user-5-rgb: 255, 107, 107;
+
+  /* Position 6 - Rose */
+  --user-6-color: #F472B6;
+  --user-6-rgb: 244, 114, 182;
 
   /* Text colors */
   --text-primary: #f0f6fc;
@@ -118,4 +134,11 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-dim);
+}
+
+/* Modal open state - prevent background scroll */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }

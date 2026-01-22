@@ -1,10 +1,6 @@
 import { useEffect, useCallback } from 'react';
 
-export const USERS = [
-  { key: 'j', name: 'Jack' },
-  { key: 'b', name: 'Bonnie' },
-];
-
+// Duration options (not configurable per instance)
 export const DURATIONS = [
   { key: '1', value: 1, label: '1 hour' },
   { key: '2', value: 2, label: '2 hours' },
@@ -12,6 +8,8 @@ export const DURATIONS = [
 ];
 
 export function useKeyboard({
+  // Users from config (required for keyboard shortcuts)
+  users = [],
   // Popup mode (edit existing booking)
   onPopupUserSelect,
   onPopupDurationSelect,
@@ -64,8 +62,8 @@ export function useKeyboard({
         return;
       }
 
-      // User selection in popup: J or B
-      const user = USERS.find((u) => u.key === key);
+      // User selection in popup: dynamic based on config
+      const user = users.find((u) => u.key === key);
       if (user && onPopupUserSelect) {
         e.preventDefault();
         onPopupUserSelect(user.name);
@@ -87,8 +85,8 @@ export function useKeyboard({
     }
 
     // PANEL MODE (create new booking)
-    // User selection: J or B
-    const user = USERS.find((u) => u.key === key);
+    // User selection: dynamic based on config
+    const user = users.find((u) => u.key === key);
     if (user && onUserSelect) {
       e.preventDefault();
       onUserSelect(user.name);
@@ -149,7 +147,7 @@ export function useKeyboard({
         return;
       }
     }
-  }, [enabled, onPopupUserSelect, onPopupDurationSelect, onPopupDelete, onPopupClose, canPopupChangeDuration, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onNavigate, onSlotFocusUp, onSlotFocusDown, onSlotSelect, isWeekView]);
+  }, [enabled, users, onPopupUserSelect, onPopupDurationSelect, onPopupDelete, onPopupClose, canPopupChangeDuration, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onNavigate, onSlotFocusUp, onSlotFocusDown, onSlotSelect, isWeekView]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

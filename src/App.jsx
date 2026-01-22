@@ -7,12 +7,16 @@ import { WeekView } from './components/WeekView';
 import { useBookings } from './hooks/useBookings';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useHourlyRefresh } from './hooks/useHourlyRefresh';
+import { useConfig } from './hooks/useConfig';
 import { addDays, formatDate, END_HOUR, generateTimeSlots, isToday, isSlotPast } from './utils/time';
 import './App.css';
 
 const TIME_SLOTS = generateTimeSlots();
 
 function App() {
+  // Get config from context
+  const { loading, error, title, users } = useConfig();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isWeekView, setIsWeekView] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -214,8 +218,9 @@ function App() {
     setFocusedSlotIndex(null);
   }, [focusedSlotIndex, visibleSlots, dateKey, handleSlotSelect]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - pass users from config
   useKeyboard({
+    users,  // Pass users from config
     // Popup mode (edit existing booking)
     onPopupUserSelect: selectedBooking ? handlePopupUserChange : undefined,
     onPopupDurationSelect: selectedBooking ? handlePopupDurationChange : undefined,
@@ -233,16 +238,42 @@ function App() {
     onSlotFocusDown: !isWeekView && !selectedSlot && !selectedBooking ? handleSlotFocusDown : undefined,
     onSlotSelect: !isWeekView && !selectedSlot && !selectedBooking && focusedSlotIndex !== null ? handleFocusedSlotSelect : undefined,
     isWeekView,
-    enabled: true,
+    enabled: !loading,  // Disable keyboard when loading
   });
 
   // Determine current user for highlighting own bookings
-  // For prototype: always assume Jack is logged in
-  const currentUser = 'Jack';
+  // For prototype: always assume first user is logged in
+  const currentUser = users.length > 0 ? users[0].name : 'User';
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="app app-loading">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Loading configuration...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="app app-error">
+        <div className="error-message">
+          <h2>Configuration Error</h2>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
       <Header
+        title={title}
         currentDate={currentDate}
         onNavigate={handleNavigate}
         onWeekToggle={handleWeekToggle}
@@ -260,6 +291,7 @@ function App() {
               onSlotSelect={handleSlotSelect}
               onBookingClick={handleBookingClick}
               currentUser={currentUser}
+              users={users}
             />
           ) : (
             <TimeStrip
@@ -272,6 +304,7 @@ function App() {
               onSlotCancel={handleSlotCancel}
               onBookingClick={handleBookingClick}
               currentUser={currentUser}
+              users={users}
             />
           )}
         </div>
@@ -284,6 +317,7 @@ function App() {
           onUserSelect={handleUserSelect}
           onDurationSelect={handleDurationSelect}
           onCancel={handleCancelPanel}
+          users={users}
         />
 
         <BookingPopup
@@ -294,6 +328,7 @@ function App() {
           onDelete={handlePopupDelete}
           onClose={handlePopupClose}
           canChangeDuration={canPopupChangeDuration}
+          users={users}
         />
       </main>
 

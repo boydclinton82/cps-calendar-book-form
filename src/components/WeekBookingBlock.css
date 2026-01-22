@@ -19,34 +19,94 @@
   z-index: 3;
 }
 
-/* Other's bookings (red glow) */
-.week-booking-block.other {
-  background: rgba(220, 38, 38, 0.12);
-  border: 1px solid rgba(220, 38, 38, 0.5);
+/* Position-based user styles - User 1 (Green) */
+.week-booking-block.user-1 {
+  background: rgba(var(--user-1-rgb), 0.12);
+  border: 1px solid rgba(var(--user-1-rgb), 0.6);
   box-shadow:
-    0 0 6px rgba(220, 38, 38, 0.25),
-    inset 0 0 8px rgba(220, 38, 38, 0.05);
+    0 0 6px rgba(var(--user-1-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-1-rgb), 0.05);
 }
 
-.week-booking-block.other .week-booking-block-label {
+.week-booking-block.user-1 .week-booking-block-label {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: var(--booked-other-color);
-  text-shadow: 0 0 4px rgba(220, 38, 38, 0.3);
+  color: var(--user-1-color);
+  text-shadow: 0 0 4px rgba(var(--user-1-rgb), 0.3);
 }
 
-/* Own bookings (green glow) */
-.week-booking-block.own {
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.6);
+/* Position-based user styles - User 2 (Magenta) */
+.week-booking-block.user-2 {
+  background: rgba(var(--user-2-rgb), 0.12);
+  border: 1px solid rgba(var(--user-2-rgb), 0.6);
   box-shadow:
-    0 0 6px rgba(34, 197, 94, 0.3),
-    inset 0 0 8px rgba(34, 197, 94, 0.05);
+    0 0 6px rgba(var(--user-2-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-2-rgb), 0.05);
 }
 
-.week-booking-block.own .week-booking-block-label {
+.week-booking-block.user-2 .week-booking-block-label {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: var(--booked-own-color);
-  text-shadow: 0 0 4px rgba(34, 197, 94, 0.3);
+  color: var(--user-2-color);
+  text-shadow: 0 0 4px rgba(var(--user-2-rgb), 0.3);
+}
+
+/* Position-based user styles - User 3 (Gold) */
+.week-booking-block.user-3 {
+  background: rgba(var(--user-3-rgb), 0.12);
+  border: 1px solid rgba(var(--user-3-rgb), 0.6);
+  box-shadow:
+    0 0 6px rgba(var(--user-3-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-3-rgb), 0.05);
+}
+
+.week-booking-block.user-3 .week-booking-block-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-3-color);
+  text-shadow: 0 0 4px rgba(var(--user-3-rgb), 0.3);
+}
+
+/* Position-based user styles - User 4 (Purple) */
+.week-booking-block.user-4 {
+  background: rgba(var(--user-4-rgb), 0.12);
+  border: 1px solid rgba(var(--user-4-rgb), 0.6);
+  box-shadow:
+    0 0 6px rgba(var(--user-4-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-4-rgb), 0.05);
+}
+
+.week-booking-block.user-4 .week-booking-block-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-4-color);
+  text-shadow: 0 0 4px rgba(var(--user-4-rgb), 0.3);
+}
+
+/* Position-based user styles - User 5 (Coral) */
+.week-booking-block.user-5 {
+  background: rgba(var(--user-5-rgb), 0.12);
+  border: 1px solid rgba(var(--user-5-rgb), 0.6);
+  box-shadow:
+    0 0 6px rgba(var(--user-5-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-5-rgb), 0.05);
+}
+
+.week-booking-block.user-5 .week-booking-block-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-5-color);
+  text-shadow: 0 0 4px rgba(var(--user-5-rgb), 0.3);
+}
+
+/* Position-based user styles - User 6 (Rose) */
+.week-booking-block.user-6 {
+  background: rgba(var(--user-6-rgb), 0.12);
+  border: 1px solid rgba(var(--user-6-rgb), 0.6);
+  box-shadow:
+    0 0 6px rgba(var(--user-6-rgb), 0.3),
+    inset 0 0 8px rgba(var(--user-6-rgb), 0.05);
+}
+
+.week-booking-block.user-6 .week-booking-block-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-6-color);
+  text-shadow: 0 0 4px rgba(var(--user-6-rgb), 0.3);
 }
 
 .week-booking-block-label {

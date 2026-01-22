@@ -1,4 +1,5 @@
 import { START_HOUR } from '../utils/time';
+import { getUserColorClass } from '../utils/colors';
 import './WeekBookingBlock.css';
 
 // Layout constants for Week View - must match WeekView.css
@@ -25,6 +26,7 @@ export function WeekBookingBlock({
   date,
   currentUser,
   onClick,
+  users = [],  // Accept users from config
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -83,9 +85,12 @@ export function WeekBookingBlock({
     }
   };
 
+  // Generate position-based user class (user-1 through user-6)
+  const userClass = getUserColorClass(user, users);
+
   return (
     <div
-      className={`week-booking-block ${isOwn ? 'own' : 'other'}`}
+      className={`week-booking-block ${userClass}`}
       style={{ top: `${top}px`, height: `${height}px` }}
       title={`${user} (${timeRangeText}) - click to edit`}
       onClick={handleClick}

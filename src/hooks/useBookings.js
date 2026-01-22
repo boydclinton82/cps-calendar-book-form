@@ -1,26 +1,64 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getBookings, saveBookings, removeBooking as removeFromStorage } from '../utils/storage';
 import { isSlotBlocked } from '../utils/time';
+import {
+  fetchBookings as apiFetchBookings,
+  createBooking as apiCreateBooking,
+  updateBooking as apiUpdateBooking,
+  deleteBooking as apiDeleteBooking,
+  isApiEnabled,
+} from '../services/api';
+import { usePollingSync } from './usePollingSync';
+
+// Polling interval in milliseconds
+const POLLING_INTERVAL = 7000;
 
 export function useBookings() {
-  const [bookings, setBookings] = useState(() => getBookings());
+  const [bookings, setBookings] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sync with localStorage on mount
+  // Initial fetch on mount
   useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === 'cps-bookings') {
-        setBookings(getBookings());
+    const loadBookings = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await apiFetchBookings();
+        setBookings(data || {});
+      } catch (err) {
+        console.error('Failed to load bookings:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+
+    loadBookings();
   }, []);
+
+  // Handle updates from polling
+  const handlePollingUpdate = useCallback((data) => {
+    if (data && typeof data === 'object') {
+      setBookings(data);
+    }
+  }, []);
+
+  // Setup polling for real-time sync (only when API is enabled)
+  const { triggerSync } = usePollingSync(
+    apiFetchBookings,
+    handlePollingUpdate,
+    {
+      interval: POLLING_INTERVAL,
+      enabled: isApiEnabled(),
+    }
+  );
 
   const getBookingsForDate = useCallback((date) => {
     return bookings[date] || {};
   }, [bookings]);
 
-  const createBooking = useCallback((date, time, user, duration) => {
+  const createBooking = useCallback(async (date, time, user, duration) => {
+    // Optimistic update
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (!newBookings[date]) {
@@ -30,12 +68,27 @@ export function useBookings() {
         ...newBookings[date],
         [time]: { user, duration },
       };
-      saveBookings(newBookings);
       return newBookings;
     });
-  }, []);
 
-  const removeBooking = useCallback((date, time) => {
+    try {
+      await apiCreateBooking({
+        dateKey: date,
+        timeKey: time,
+        user,
+        duration,
+      });
+    } catch (err) {
+      // Rollback on error
+      console.error('Failed to create booking:', err);
+      setError(err.message);
+      // Trigger sync to get correct state
+      triggerSync();
+    }
+  }, [triggerSync]);
+
+  const removeBooking = useCallback(async (date, time) => {
+    // Optimistic update
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (newBookings[date] && newBookings[date][time]) {
@@ -43,13 +96,29 @@ export function useBookings() {
         if (Object.keys(newBookings[date]).length === 0) {
           delete newBookings[date];
         }
-        saveBookings(newBookings);
       }
       return newBookings;
     });
-  }, []);
 
-  const updateBooking = useCallback((date, time, updates) => {
+    try {
+      await apiDeleteBooking({
+        dateKey: date,
+        timeKey: time,
+      });
+    } catch (err) {
+      // Rollback on error
+      console.error('Failed to delete booking:', err);
+      setError(err.message);
+      // Trigger sync to get correct state
+      triggerSync();
+    }
+  }, [triggerSync]);
+
+  const updateBooking = useCallback(async (date, time, updates) => {
+    // Store previous value for rollback
+    const previousBooking = bookings[date]?.[time];
+
+    // Optimistic update
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (newBookings[date] && newBookings[date][time]) {
@@ -57,11 +126,24 @@ export function useBookings() {
           ...newBookings[date],
           [time]: { ...newBookings[date][time], ...updates },
         };
-        saveBookings(newBookings);
       }
       return newBookings;
     });
-  }, []);
+
+    try {
+      await apiUpdateBooking({
+        dateKey: date,
+        timeKey: time,
+        updates,
+      });
+    } catch (err) {
+      // Rollback on error
+      console.error('Failed to update booking:', err);
+      setError(err.message);
+      // Trigger sync to get correct state
+      triggerSync();
+    }
+  }, [bookings, triggerSync]);
 
   // Simplified getSlotStatus - only returns status and booking info
   // Position calculation is now handled by overlay components
@@ -144,6 +226,8 @@ export function useBookings() {
 
   return {
     bookings,
+    loading,
+    error,
     getBookingsForDate,
     createBooking,
     removeBooking,
@@ -151,5 +235,7 @@ export function useBookings() {
     getSlotStatus,
     canBook,
     canChangeDuration,
+    // Expose sync function for manual refresh
+    refreshBookings: triggerSync,
   };
 }

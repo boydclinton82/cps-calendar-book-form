@@ -18,6 +18,9 @@
   transform: translate(-50%, -50%);
   width: 340px;
   max-width: 90vw;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

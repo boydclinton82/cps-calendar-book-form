@@ -1,11 +1,11 @@
 import { formatDisplayDate, isToday } from '../utils/time';
 import './Header.css';
 
-export function Header({ currentDate, onNavigate, onWeekToggle, isWeekView }) {
+export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekView }) {
   return (
     <header className="header">
       <div className="header-top">
-        <h1 className="header-title mono">CPS Software Booking</h1>
+        <h1 className="header-title mono">{title}</h1>
         <button
           className={`week-toggle ${isWeekView ? 'active' : ''}`}
           onClick={onWeekToggle}

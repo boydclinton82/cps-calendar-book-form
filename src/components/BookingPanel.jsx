@@ -1,4 +1,5 @@
-import { USERS, DURATIONS } from '../hooks/useKeyboard';
+import { useEffect } from 'react';
+import { DURATIONS } from '../hooks/useKeyboard';
 import './BookingPanel.css';
 
 export function BookingPanel({
@@ -9,7 +10,20 @@ export function BookingPanel({
   onUserSelect,
   onDurationSelect,
   onCancel,
+  users = [],  // Accept users from config
 }) {
+  // Prevent background scroll when panel is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!isOpen || !selectedSlot) {
     return null;
   }
@@ -24,7 +38,7 @@ export function BookingPanel({
       <div className="panel-section">
         <h3 className="section-title">Who?</h3>
         <div className="option-group">
-          {USERS.map((user) => (
+          {users.map((user) => (
             <button
               key={user.key}
               className={`option-btn ${selectedUser === user.name ? 'selected' : ''}`}

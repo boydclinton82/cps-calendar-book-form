@@ -15,6 +15,7 @@ export function TimeStrip({
   onSlotCancel,
   onBookingClick,
   currentUser,
+  users = [],  // Accept users from config
 }) {
   const dateKey = formatDate(date);
   const dayBookings = bookings[dateKey] || {};
@@ -61,6 +62,7 @@ export function TimeStrip({
           currentUser={currentUser}
           onCancel={handleOverlayCancel}
           onBookingClick={handleBookingClick}
+          users={users}
         />
       </div>
     </div>
