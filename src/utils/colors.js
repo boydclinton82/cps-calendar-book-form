@@ -14,10 +14,16 @@
  * @returns {string} CSS class name (e.g., "user-1", "user-2")
  */
 export function getUserColorClass(userName, users) {
+  const user = users.find(u => u.name === userName);
+
+  // Use colorIndex if available (from admin wizard)
+  if (user && user.colorIndex !== undefined) {
+    // colorIndex is 0-5, CSS classes are user-1 through user-6
+    return `user-${user.colorIndex + 1}`;
+  }
+
+  // Fallback: position-based for backwards compatibility
   const index = users.findIndex(u => u.name === userName);
-  // Position is 1-indexed for CSS classes, fallback to 1 if not found
   const position = index >= 0 ? index + 1 : 1;
-  // Cap at 6 (max supported colors)
-  const cappedPosition = Math.min(position, 6);
-  return `user-${cappedPosition}`;
+  return `user-${Math.min(position, 6)}`;
 }

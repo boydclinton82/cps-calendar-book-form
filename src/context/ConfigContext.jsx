@@ -19,7 +19,7 @@ const FALLBACK_CONFIG = {
 export const ConfigContext = createContext(null);
 
 export function ConfigProvider({ children }) {
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState(FALLBACK_CONFIG);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -58,7 +58,7 @@ export function ConfigProvider({ children }) {
     error,
     // Convenience getters
     title: config?.title || 'Loading...',
-    users: config?.users || [],
+    users: config?.users || FALLBACK_CONFIG.users,
     slug: config?.slug || '',
     // Whether API is enabled
     apiEnabled: isApiEnabled(),
