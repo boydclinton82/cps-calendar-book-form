@@ -63,7 +63,7 @@ export function useKeyboard({
       }
 
       // User selection in popup: dynamic based on config
-      const user = users.find((u) => u.key === key);
+      const user = users.find((u) => u.key.toLowerCase() === key);
       if (user && onPopupUserSelect) {
         e.preventDefault();
         onPopupUserSelect(user.name);
@@ -86,7 +86,7 @@ export function useKeyboard({
 
     // PANEL MODE (create new booking)
     // User selection: dynamic based on config
-    const user = users.find((u) => u.key === key);
+    const user = users.find((u) => u.key.toLowerCase() === key);
     if (user && onUserSelect) {
       e.preventDefault();
       onUserSelect(user.name);
