@@ -1,10 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { TimeStrip } from './components/TimeStrip';
 import { BookingPanel } from './components/BookingPanel';
 import { BookingPopup } from './components/BookingPopup';
 import { WeekView } from './components/WeekView';
 import { useBookings } from './hooks/useBookings';
+import { getTimezonePreference, saveTimezonePreference } from './utils/storage';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useHourlyRefresh } from './hooks/useHourlyRefresh';
 import { useConfig } from './hooks/useConfig';
@@ -23,6 +24,7 @@ function App() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [focusedSlotIndex, setFocusedSlotIndex] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [useNSWTime, setUseNSWTime] = useState(() => getTimezonePreference());
 
   const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration } = useBookings();
 
@@ -45,6 +47,11 @@ function App() {
 
   // Auto-refresh on the hour to update past slots
   useHourlyRefresh();
+
+  // Persist timezone preference to localStorage
+  useEffect(() => {
+    saveTimezonePreference(useNSWTime);
+  }, [useNSWTime]);
 
   // Compute if current hour is available for "Book Now" button
   const currentHourAvailable = useMemo(() => {
@@ -81,6 +88,11 @@ function App() {
     setIsWeekView((prev) => !prev);
     setSelectedSlot(null);
     setSelectedUser(null);
+  }, []);
+
+  // Toggle timezone display
+  const handleTimezoneToggle = useCallback(() => {
+    setUseNSWTime(prev => !prev);
   }, []);
 
   // Select day from week view
@@ -316,6 +328,8 @@ function App() {
         isWeekView={isWeekView}
         showBookNow={currentHourAvailable}
         onBookNow={handleBookNow}
+        useNSWTime={useNSWTime}
+        onTimezoneToggle={handleTimezoneToggle}
       />
 
       <main className="main-content">
@@ -330,6 +344,7 @@ function App() {
               onBookingClick={handleBookingClick}
               currentUser={currentUser}
               users={users}
+              useNSWTime={useNSWTime}
             />
           ) : (
             <TimeStrip
@@ -343,6 +358,7 @@ function App() {
               onBookingClick={handleBookingClick}
               currentUser={currentUser}
               users={users}
+              useNSWTime={useNSWTime}
             />
           )}
         </div>
@@ -356,6 +372,7 @@ function App() {
           onDurationSelect={handleDurationSelect}
           onCancel={handleCancelPanel}
           users={users}
+          useNSWTime={useNSWTime}
         />
 
         <BookingPopup

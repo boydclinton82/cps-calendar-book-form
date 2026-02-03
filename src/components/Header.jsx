@@ -1,7 +1,7 @@
-import { formatDisplayDate, isToday } from '../utils/time';
+import { formatDisplayDate, isToday, getNSWOffsetLabel } from '../utils/time';
 import './Header.css';
 
-export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekView, showBookNow, onBookNow }) {
+export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekView, showBookNow, onBookNow, useNSWTime, onTimezoneToggle }) {
   return (
     <header className="header">
       <div className="header-top">
@@ -22,6 +22,14 @@ export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekVie
             aria-pressed={isWeekView}
           >
             <span className="mono">[W]</span> {isWeekView ? 'Day View' : 'Week View'}
+          </button>
+          <button
+            className={`timezone-toggle ${useNSWTime ? 'active' : ''}`}
+            onClick={onTimezoneToggle}
+            aria-pressed={useNSWTime}
+            aria-label="Toggle timezone display"
+          >
+            <span className="mono">[T]</span> {useNSWTime ? `NSW ${getNSWOffsetLabel()}` : 'QLD'}
           </button>
         </div>
       </div>
