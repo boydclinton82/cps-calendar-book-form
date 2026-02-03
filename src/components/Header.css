@@ -32,6 +32,49 @@
   box-shadow: 0 0 12px var(--accent-glow), 0 0 24px var(--accent-glow);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.book-now-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--bg-primary);
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 16px var(--accent-glow-strong), inset 0 0 12px rgba(255, 255, 255, 0.1);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px var(--accent-glow-strong), inset 0 0 12px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--accent-glow-strong), 0 0 32px var(--accent-glow), inset 0 0 16px rgba(255, 255, 255, 0.15);
+  }
+}
+
+.book-now-btn:hover {
+  background: var(--available-hover);
+  transform: scale(1.05);
+  box-shadow: 0 0 28px var(--accent-glow-strong), 0 0 40px var(--accent-glow);
+  animation: none;
+}
+
+.book-now-btn .mono {
+  opacity: 0.9;
+  font-size: 0.8rem;
+}
+
 .week-toggle {
   display: flex;
   align-items: center;
@@ -185,6 +228,10 @@
   }
 
   .header-hints {
+    display: none;
+  }
+
+  .week-toggle {
     display: none;
   }
 }

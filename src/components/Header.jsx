@@ -1,18 +1,29 @@
 import { formatDisplayDate, isToday } from '../utils/time';
 import './Header.css';
 
-export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekView }) {
+export function Header({ title, currentDate, onNavigate, onWeekToggle, isWeekView, showBookNow, onBookNow }) {
   return (
     <header className="header">
       <div className="header-top">
         <h1 className="header-title mono">{title}</h1>
-        <button
-          className={`week-toggle ${isWeekView ? 'active' : ''}`}
-          onClick={onWeekToggle}
-          aria-pressed={isWeekView}
-        >
-          <span className="mono">[W]</span> {isWeekView ? 'Day View' : 'Week View'}
-        </button>
+        <div className="header-actions">
+          {showBookNow && (
+            <button
+              className="book-now-btn"
+              onClick={onBookNow}
+              aria-label="Book current hour"
+            >
+              <span className="mono">[B]</span> Book Now
+            </button>
+          )}
+          <button
+            className={`week-toggle ${isWeekView ? 'active' : ''}`}
+            onClick={onWeekToggle}
+            aria-pressed={isWeekView}
+          >
+            <span className="mono">[W]</span> {isWeekView ? 'Day View' : 'Week View'}
+          </button>
+        </div>
       </div>
 
       <div className="header-nav">
