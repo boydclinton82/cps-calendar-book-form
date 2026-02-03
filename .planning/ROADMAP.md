@@ -26,10 +26,10 @@ This milestone delivers three improvements to the booking calendar: fixing the p
   2. At 9:59, the 9:00 slot is still visible and bookable
   3. At 10:00, the 9:00 slot becomes past/greyed out
   4. User can book the current hour slot at any point during that hour
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: Fix isSlotPast() logic in time.js
+- [ ] 01-01-PLAN.md - Fix isSlotPast() to check hour END instead of START
 
 ### Phase 2: Quick Booking
 **Goal**: Users can instantly book the current hour with one click
@@ -81,7 +81,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Time Slot Fix | 0/1 | Not started | - |
+| 1. Time Slot Fix | 0/1 | Planned | - |
 | 2. Quick Booking | 0/1 | Not started | - |
 | 3. Timezone Display | 0/1 | Not started | - |
 | 4. Deployment | 0/1 | Not started | - |
