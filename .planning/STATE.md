@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 
 ## Current Position
 
-Phase: 3 of 4 (Timezone Display) - GAPS FOUND
-Plan: 1 of 3 in current phase (2 gap closure plans pending)
-Status: Manual testing found gaps, closure plans created
-Last activity: 2026-02-04 - Created gap closure plans 03-02 and 03-03
+Phase: 3 of 4 (Timezone Display) - GAPS CLOSING
+Plan: 2 of 3 in current phase (1 gap closure plan pending: 03-03)
+Status: In progress - hotkey gap closed
+Last activity: 2026-02-04 - Completed 03-02-PLAN.md (Hotkey Gap Closure)
 
-Progress: [#####.....] 50%
+Progress: [######....] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~4.7 min
-- Total execution time: ~14 min
+- Total plans completed: 4
+- Average duration: ~4.3 min
+- Total execution time: ~17 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [#####.....] 50%
 |-------|-------|-------|----------|
 | 01-time-slot-fix | 1 | ~5 min | ~5 min |
 | 02-quick-booking | 1 | ~4 min | ~4 min |
-| 03-timezone-display | 1 | ~5 min | ~5 min |
+| 03-timezone-display | 2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 02-01 (~4 min), 03-01 (~5 min)
+- Last 5 plans: 01-01 (~5 min), 02-01 (~4 min), 03-01 (~5 min), 03-02 (~3 min)
 - Trend: Consistent fast execution
 
 *Updated after each plan completion*
@@ -55,6 +55,8 @@ Recent decisions affecting current work:
 - [03-01] Use Intl.DateTimeFormat with Australia/Sydney to detect AEDT vs AEST
 - [03-01] Display-only conversion: bookings always stored in QLD time
 - [03-01] Toggle shows offset indicator (NSW +1h during DST, +0h during AEST)
+- [03-02] B key conditional on currentHourAvailable (same as button visibility)
+- [03-02] Both hotkeys disabled during popup mode (selectedBooking)
 
 ### Pending Todos
 
@@ -67,7 +69,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed 03-01-PLAN.md (Phase 3 complete)
+Stopped at: Completed 03-02-PLAN.md (Hotkey Gap Closure)
 Resume file: None
 
 ---
