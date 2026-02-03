@@ -281,6 +281,8 @@ function App() {
     onCancel: !selectedBooking && selectedSlot ? handleCancelPanel : undefined,
     // General navigation
     onWeekToggle: !selectedBooking ? handleWeekToggle : undefined,
+    onBookNow: !selectedBooking && currentHourAvailable ? handleBookNow : undefined,
+    onTimezoneToggle: !selectedBooking ? handleTimezoneToggle : undefined,
     onNavigate: !selectedBooking ? handleNavigate : undefined,
     onSlotFocusUp: !isWeekView && !selectedSlot && !selectedBooking ? handleSlotFocusUp : undefined,
     onSlotFocusDown: !isWeekView && !selectedSlot && !selectedBooking ? handleSlotFocusDown : undefined,
