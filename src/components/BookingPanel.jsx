@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { DURATIONS } from '../hooks/useKeyboard';
+import { formatHour } from '../utils/time';
 import './BookingPanel.css';
 
 export function BookingPanel({
@@ -11,6 +12,7 @@ export function BookingPanel({
   onDurationSelect,
   onCancel,
   users = [],  // Accept users from config
+  useNSWTime = false,
 }) {
   // Prevent background scroll when panel is open
   useEffect(() => {
@@ -28,11 +30,13 @@ export function BookingPanel({
     return null;
   }
 
+  const displayTime = selectedSlot ? formatHour(selectedSlot.hour, useNSWTime) : '';
+
   return (
     <div className={`booking-panel ${isOpen ? 'open' : ''}`}>
       <div className="panel-header">
         <h2 className="panel-title">Book Slot</h2>
-        <span className="panel-time mono">{selectedSlot.time}</span>
+        <span className="panel-time mono">{displayTime}</span>
       </div>
 
       <div className="panel-section">

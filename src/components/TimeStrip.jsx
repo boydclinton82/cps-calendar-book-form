@@ -16,6 +16,7 @@ export function TimeStrip({
   onBookingClick,
   currentUser,
   users = [],  // Accept users from config
+  useNSWTime = false,
 }) {
   const dateKey = formatDate(date);
   const dayBookings = bookings[dateKey] || {};
@@ -53,6 +54,7 @@ export function TimeStrip({
               isSelected={isSelected}
               isFocused={isFocused}
               onClick={() => onSlotSelect?.({ ...slot, dateKey })}
+              useNSWTime={useNSWTime}
             />
           );
         })}

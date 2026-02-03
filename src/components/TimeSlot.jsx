@@ -1,4 +1,4 @@
-import { isSlotPast } from '../utils/time';
+import { isSlotPast, formatHour } from '../utils/time';
 import './TimeSlot.css';
 
 export function TimeSlot({
@@ -10,9 +10,11 @@ export function TimeSlot({
   isSelected,
   isFocused,
   onClick,
+  useNSWTime = false,
 }) {
   const isPast = isSlotPast(date, hour);
   const { status } = slotStatus;
+  const displayTime = formatHour(hour, useNSWTime);
 
   const isBooked = status === 'booked';
   const isBlocked = status === 'blocked';
@@ -54,13 +56,13 @@ export function TimeSlot({
       disabled={isPast || isOccupied}
       aria-label={
         isPast
-          ? `${time} - Past`
+          ? `${displayTime} - Past`
           : isOccupied
-          ? `${time} - Occupied`
-          : `${time} - Available, click to book`
+          ? `${displayTime} - Occupied`
+          : `${displayTime} - Available, click to book`
       }
     >
-      <span className="time-label mono">{time}</span>
+      <span className="time-label mono">{displayTime}</span>
     </button>
   );
 }

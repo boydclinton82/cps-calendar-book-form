@@ -1,10 +1,10 @@
-import { getWeekDays, getStartOfWeek, formatDate, formatShortDate, generateTimeSlots, isToday, isSlotPast } from '../utils/time';
+import { getWeekDays, getStartOfWeek, formatDate, formatShortDate, generateTimeSlots, isToday, isSlotPast, formatHour } from '../utils/time';
 import { WeekDayOverlay } from './WeekDayOverlay';
 import './WeekView.css';
 
 const TIME_SLOTS = generateTimeSlots();
 
-export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, onSlotSelect, onBookingClick, currentUser, users = [] }) {
+export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, onSlotSelect, onBookingClick, currentUser, users = [], useNSWTime = false }) {
   const weekStart = getStartOfWeek(currentDate);
   const weekDays = getWeekDays(weekStart);
 
@@ -49,14 +49,15 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, on
   const getSlotTitle = (date, slot) => {
     const dateKey = formatDate(date);
     const slotStatus = getSlotStatus(dateKey, slot.key, slot.hour);
+    const displayTime = formatHour(slot.hour, useNSWTime);
 
     if (slotStatus.status === 'booked') {
-      return `${slot.time}: ${slotStatus.booking.user} (${slotStatus.booking.duration}hr)`;
+      return `${displayTime}: ${slotStatus.booking.user} (${slotStatus.booking.duration}hr)`;
     }
     if (slotStatus.status === 'blocked') {
-      return `${slot.time}: Blocked by ${slotStatus.booking?.user}`;
+      return `${displayTime}: Blocked by ${slotStatus.booking?.user}`;
     }
-    return `${slot.time}: Available`;
+    return `${displayTime}: Available`;
   };
 
   return (
@@ -67,7 +68,7 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, on
           <div className="column-header"></div>
           {TIME_SLOTS.map((slot) => (
             <div key={slot.key} className="time-cell mono">
-              {slot.time}
+              {formatHour(slot.hour, useNSWTime)}
             </div>
           ))}
         </div>
