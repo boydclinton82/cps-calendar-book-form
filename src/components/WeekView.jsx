@@ -110,6 +110,7 @@ export function WeekView({ currentDate, bookings, getSlotStatus, onDaySelect, on
                   currentUser={currentUser}
                   onBookingClick={(timeKey, booking) => handleBookingClickWrapper(dateKey, timeKey, booking)}
                   users={users}
+                  useNSWTime={useNSWTime}
                 />
               </div>
             </div>

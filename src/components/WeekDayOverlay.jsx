@@ -7,6 +7,7 @@ export function WeekDayOverlay({
   currentUser,
   onBookingClick,
   users = [],  // Accept users from config
+  useNSWTime = false,
 }) {
   // dayBookings is an object: { "07:00": { user: "Jack", duration: 2 }, ... }
   const bookingEntries = Object.entries(dayBookings || {});
@@ -28,6 +29,7 @@ export function WeekDayOverlay({
             currentUser={currentUser}
             onClick={() => onBookingClick?.(timeKey, booking)}
             users={users}
+            useNSWTime={useNSWTime}
           />
         );
       })}

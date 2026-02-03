@@ -1,4 +1,4 @@
-import { START_HOUR } from '../utils/time';
+import { START_HOUR, isNSWInDST } from '../utils/time';
 import { getUserColorClass } from '../utils/colors';
 import './WeekBookingBlock.css';
 
@@ -7,16 +7,24 @@ const SLOT_HEIGHT = 30;
 const SLOT_GAP = 4;
 
 // Format time range (e.g., 17-19 -> "5-7 PM", 11-13 -> "11 AM-1 PM")
-function formatTimeRange(startHour, endHour) {
-  const startPeriod = startHour >= 12 ? 'PM' : 'AM';
-  const endPeriod = endHour >= 12 ? 'PM' : 'AM';
-  const startDisplay = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
-  const endDisplay = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
+function formatTimeRange(startHour, endHour, useNSWTime = false) {
+  let startDisplay = startHour;
+  let endDisplay = endHour;
+
+  if (useNSWTime && isNSWInDST()) {
+    startDisplay = startHour + 1;
+    endDisplay = endHour + 1;
+  }
+
+  const startPeriod = startDisplay >= 12 ? 'PM' : 'AM';
+  const endPeriod = endDisplay >= 12 ? 'PM' : 'AM';
+  const startH = startDisplay > 12 ? startDisplay - 12 : startDisplay === 0 ? 12 : startDisplay;
+  const endH = endDisplay > 12 ? endDisplay - 12 : endDisplay === 0 ? 12 : endDisplay;
 
   if (startPeriod === endPeriod) {
-    return `${startDisplay}-${endDisplay} ${endPeriod}`;
+    return `${startH}-${endH} ${endPeriod}`;
   } else {
-    return `${startDisplay} ${startPeriod}-${endDisplay} ${endPeriod}`;
+    return `${startH} ${startPeriod}-${endH} ${endPeriod}`;
   }
 }
 
@@ -27,6 +35,7 @@ export function WeekBookingBlock({
   currentUser,
   onClick,
   users = [],  // Accept users from config
+  useNSWTime = false,
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -77,7 +86,7 @@ export function WeekBookingBlock({
 
   // Calculate display time range
   const endHour = effectiveStartHour + remainingDuration;
-  const timeRangeText = formatTimeRange(effectiveStartHour, endHour);
+  const timeRangeText = formatTimeRange(effectiveStartHour, endHour, useNSWTime);
 
   const handleClick = () => {
     if (onClick) {
