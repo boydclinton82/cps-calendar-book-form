@@ -67,11 +67,9 @@ export function BookingBlock({
     // Past date - entire booking is past
     return null;
   } else if (bookingDate.getTime() === today.getTime()) {
-    // Today - calculate how many hours are past using isSlotPast logic
+    // Today - calculate how many hours are past using isSlotPast
     for (let i = 0; i < duration; i++) {
-      const slotDate = new Date(date);
-      slotDate.setHours(startHour + i, 0, 0, 0);
-      if (slotDate < now) {
+      if (isSlotPast(date, startHour + i)) {
         clipHours++;
       }
     }
@@ -86,15 +84,12 @@ export function BookingBlock({
   const effectiveSlotHeight = SLOT_HEIGHT + SLOT_GAP;
 
   // The slot index is relative to the first visible slot
-  // Match isSlotPast logic: a slot is past if slotDate (set to hour:00:00) < now
-  // So if it's 4:30 PM, the 4:00 PM slot is past, first visible is 5:00 PM
+  // Must use isSlotPast for consistency with TimeStrip filtering
   let firstVisibleHour = START_HOUR;
   if (bookingDate.getTime() === today.getTime()) {
-    // Find first hour that isn't past
+    // Find first hour that isn't past - use isSlotPast for consistency
     for (let h = START_HOUR; h < 24; h++) {
-      const slotDate = new Date(date);
-      slotDate.setHours(h, 0, 0, 0);
-      if (slotDate >= now) {
+      if (!isSlotPast(date, h)) {
         firstVisibleHour = h;
         break;
       }
