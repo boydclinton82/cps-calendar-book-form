@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Users can quickly see availability and book time slots without conflicts
-**Current focus:** Phase 3 - Timezone Display (gap closure)
+**Current focus:** Phase 3 - Timezone Display COMPLETE
 
 ## Current Position
 
-Phase: 3 of 4 (Timezone Display) - GAPS CLOSING
-Plan: 2 of 3 in current phase (1 gap closure plan pending: 03-03)
-Status: In progress - hotkey gap closed
-Last activity: 2026-02-04 - Completed 03-02-PLAN.md (Hotkey Gap Closure)
+Phase: 3 of 4 (Timezone Display) - COMPLETE
+Plan: 3 of 3 in current phase (all gap closure plans complete)
+Status: Phase complete - ready for Phase 4: Deployment
+Last activity: 2026-02-04 - Completed 03-03-PLAN.md (Booking Display Gap Closure)
 
-Progress: [######....] 60%
+Progress: [#######...] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~4.3 min
-- Total execution time: ~17 min
+- Total plans completed: 5
+- Average duration: ~4.0 min
+- Total execution time: ~20 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [######....] 60%
 |-------|-------|-------|----------|
 | 01-time-slot-fix | 1 | ~5 min | ~5 min |
 | 02-quick-booking | 1 | ~4 min | ~4 min |
-| 03-timezone-display | 2 | ~8 min | ~4 min |
+| 03-timezone-display | 3 | ~11 min | ~3.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 02-01 (~4 min), 03-01 (~5 min), 03-02 (~3 min)
+- Last 5 plans: 02-01 (~4 min), 03-01 (~5 min), 03-02 (~3 min), 03-03 (~3 min)
 - Trend: Consistent fast execution
 
 *Updated after each plan completion*
@@ -57,6 +57,8 @@ Recent decisions affecting current work:
 - [03-01] Toggle shows offset indicator (NSW +1h during DST, +0h during AEST)
 - [03-02] B key conditional on currentHourAvailable (same as button visibility)
 - [03-02] Both hotkeys disabled during popup mode (selectedBooking)
+- [03-03] Thread useNSWTime via props (matches existing pattern)
+- [03-03] Duplicate formatTimeRange in each component (simple, self-contained)
 
 ### Pending Todos
 
@@ -69,7 +71,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed 03-02-PLAN.md (Hotkey Gap Closure)
+Stopped at: Completed 03-03-PLAN.md (Booking Display Gap Closure)
 Resume file: None
 
 ---
