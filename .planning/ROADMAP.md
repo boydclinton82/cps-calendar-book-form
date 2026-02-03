@@ -12,7 +12,7 @@ This milestone delivers three improvements to the booking calendar: fixing the p
 
 - [x] **Phase 1: Time Slot Fix** - Fix current hour visibility bug ✓
 - [x] **Phase 2: Quick Booking** - Add "Book Now" button for current hour ✓
-- [x] **Phase 3: Timezone Display** - Add NSW timezone toggle ✓
+- [ ] **Phase 3: Timezone Display** - Add NSW timezone toggle (gaps found)
 - [ ] **Phase 4: Deployment** - Deploy to all instances
 
 ## Phase Details
@@ -56,10 +56,12 @@ Plans:
   3. Toggle shows current offset indicator (e.g., "NSW +1h" vs "QLD")
   4. Closing and reopening browser retains toggle preference
   5. Actual bookings stored in QLD time regardless of display setting
-**Plans**: 1 plan
+**Plans**: 3 plans (1 complete + 2 gap closure)
 
 Plans:
 - [x] 03-01-PLAN.md - Add timezone toggle, DST detection, and display conversion ✓
+- [ ] 03-02-PLAN.md - Fix [B] and [T] hotkeys (gap closure)
+- [ ] 03-03-PLAN.md - Fix booking display timezone and visual overlap (gap closure)
 
 ### Phase 4: Deployment
 **Goal**: All changes live on all 5 instances
@@ -83,7 +85,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
 | 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
-| 3. Timezone Display | 1/1 | ✓ Complete | 2026-02-04 |
+| 3. Timezone Display | 1/3 | Gaps found | - |
 | 4. Deployment | 0/1 | Not started | - |
 
 ---

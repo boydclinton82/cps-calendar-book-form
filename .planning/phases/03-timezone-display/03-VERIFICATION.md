@@ -1,7 +1,7 @@
 ---
 phase: 03-timezone-display
 verified: 2026-02-04T10:30:00Z
-status: passed
+status: gaps_found
 score: 6/6 must-haves verified
 ---
 
@@ -106,9 +106,37 @@ npm run build
 
 Build passes with no errors.
 
+## Gaps Found (Manual Testing 2026-02-04)
+
+**Score updated:** Gaps found during manual UAT that were not caught by automated verification.
+
+### Gap 1: Hotkeys not functional for [B] Book Now and [T] Timezone Toggle
+**Severity:** Medium
+**Description:** The buttons display hotkey hints ([B], [T]) but pressing B or T on keyboard does nothing. The hotkey handlers were never wired up.
+**Expected:** Pressing B triggers Book Now, pressing T toggles timezone
+**Actual:** Only mouse clicks work
+**Plan required:** 03-02-PLAN.md
+
+### Gap 2: Day View booking slot visual overlap/corruption
+**Severity:** High
+**Description:** When timezone is toggled, booked slots show corrupted display with overlapping text (e.g., "Book 8:00 AM AM" and slot times misaligned with booking cards). The slot time labels and booking descriptions are overlapping incorrectly.
+**Expected:** Clean display with booking cards properly positioned in their time slots
+**Actual:** Visual corruption with overlapping elements
+**Plan required:** 03-03-PLAN.md
+
+### Gap 3: Booking description times not timezone-aware
+**Severity:** Medium
+**Description:** Inside booking cards, the time range (e.g., "Giuliano (12-2 PM)") does not update when timezone is toggled. The slot times on the left update correctly, but booking internal times stay in QLD.
+**Expected:** "Giuliano (12-2 PM)" becomes "Giuliano (1-3 PM)" when toggled to NSW +1h
+**Actual:** Booking times stay static regardless of toggle
+**Locations:** TimeSlot.jsx booking display, WeekView.jsx booking cells
+**Plan required:** 03-03-PLAN.md (can be combined with Gap 2)
+
+---
+
 ## Summary
 
-Phase 3 goal **achieved**. All 6 must-have truths verified against actual codebase:
+Phase 3 goal **partially achieved**. All 6 must-have truths verified against actual codebase:
 
 1. **Toggle visible** - timezone-toggle button in Header.jsx
 2. **+1h during AEDT** - formatHour() applies offset when isNSWInDST()
