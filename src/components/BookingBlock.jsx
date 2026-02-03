@@ -1,4 +1,4 @@
-import { isSlotPast, START_HOUR } from '../utils/time';
+import { isSlotPast, START_HOUR, isNSWInDST } from '../utils/time';
 import { getUserColorClass } from '../utils/colors';
 import './BookingBlock.css';
 
@@ -7,25 +7,37 @@ const SLOT_HEIGHT = 36;  // Approximate height of a TimeSlot
 const SLOT_GAP = 6;      // Gap from TimeStrip.css
 
 // Format hour to short time string (e.g., 17 -> "5 PM", 9 -> "9 AM", 12 -> "12 PM")
-function formatShortHour(hour) {
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-  return `${displayHour} ${period}`;
+function formatShortHour(hour, useNSWTime = false) {
+  let displayHour = hour;
+  if (useNSWTime && isNSWInDST()) {
+    displayHour = hour + 1;
+  }
+  const period = displayHour >= 12 ? 'PM' : 'AM';
+  const h = displayHour > 12 ? displayHour - 12 : displayHour === 0 ? 12 : displayHour;
+  return `${h} ${period}`;
 }
 
 // Format time range (e.g., 17-19 -> "5-7 PM", 11-13 -> "11 AM-1 PM")
-function formatTimeRange(startHour, endHour) {
-  const startPeriod = startHour >= 12 ? 'PM' : 'AM';
-  const endPeriod = endHour >= 12 ? 'PM' : 'AM';
-  const startDisplay = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
-  const endDisplay = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
+function formatTimeRange(startHour, endHour, useNSWTime = false) {
+  let startDisplay = startHour;
+  let endDisplay = endHour;
+
+  if (useNSWTime && isNSWInDST()) {
+    startDisplay = startHour + 1;
+    endDisplay = endHour + 1;
+  }
+
+  const startPeriod = startDisplay >= 12 ? 'PM' : 'AM';
+  const endPeriod = endDisplay >= 12 ? 'PM' : 'AM';
+  const startH = startDisplay > 12 ? startDisplay - 12 : startDisplay === 0 ? 12 : startDisplay;
+  const endH = endDisplay > 12 ? endDisplay - 12 : endDisplay === 0 ? 12 : endDisplay;
 
   if (startPeriod === endPeriod) {
     // Same period: "5-7 PM"
-    return `${startDisplay}-${endDisplay} ${endPeriod}`;
+    return `${startH}-${endH} ${endPeriod}`;
   } else {
     // Different periods: "11 AM-1 PM"
-    return `${startDisplay} ${startPeriod}-${endDisplay} ${endPeriod}`;
+    return `${startH} ${startPeriod}-${endH} ${endPeriod}`;
   }
 }
 
@@ -37,6 +49,7 @@ export function BookingBlock({
   onCancel,
   onClick,
   users = [],  // Accept users from config
+  useNSWTime = false,
 }) {
   const { user, duration } = booking;
   const isOwn = user === currentUser;
@@ -112,7 +125,7 @@ export function BookingBlock({
   // Calculate display time range (using effective start after clipping)
   const displayStartHour = effectiveStartHour;
   const displayEndHour = effectiveStartHour + remainingDuration;
-  const timeRangeText = formatTimeRange(displayStartHour, displayEndHour);
+  const timeRangeText = formatTimeRange(displayStartHour, displayEndHour, useNSWTime);
 
   // Generate position-based user class (user-1 through user-6)
   const userClass = getUserColorClass(user, users);
@@ -124,7 +137,7 @@ export function BookingBlock({
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      aria-label={`Booking by ${user} from ${formatShortHour(displayStartHour)} to ${formatShortHour(displayEndHour)}, click to edit`}
+      aria-label={`Booking by ${user} from ${formatShortHour(displayStartHour, useNSWTime)} to ${formatShortHour(displayEndHour, useNSWTime)}, click to edit`}
     >
       <span className="booking-block-info">
         {user} ({timeRangeText})

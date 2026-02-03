@@ -65,6 +65,7 @@ export function TimeStrip({
           onCancel={handleOverlayCancel}
           onBookingClick={handleBookingClick}
           users={users}
+          useNSWTime={useNSWTime}
         />
       </div>
     </div>
