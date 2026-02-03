@@ -48,9 +48,9 @@ export function formatShortDate(date) {
 
 export function isSlotPast(date, hour) {
   const now = new Date();
-  const slotDate = new Date(date);
-  slotDate.setHours(hour, 0, 0, 0);
-  return slotDate < now;
+  const slotEnd = new Date(date);
+  slotEnd.setHours(hour + 1, 0, 0, 0);  // Sets to END of hour (start of next hour)
+  return slotEnd <= now;  // True only when the next hour begins
 }
 
 export function isToday(date) {
