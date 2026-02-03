@@ -89,6 +89,12 @@ function App() {
     setIsWeekView(false);
   }, []);
 
+  // Slot selection
+  const handleSlotSelect = useCallback((slot) => {
+    setSelectedSlot(slot);
+    setSelectedUser(null);
+  }, []);
+
   // Handle "Book Now" button - books current hour
   const handleBookNow = useCallback(() => {
     const now = new Date();
@@ -101,12 +107,6 @@ function App() {
     };
     handleSlotSelect(slot);
   }, [handleSlotSelect]);
-
-  // Slot selection
-  const handleSlotSelect = useCallback((slot) => {
-    setSelectedSlot(slot);
-    setSelectedUser(null);
-  }, []);
 
   // Cancel booking panel
   const handleCancelPanel = useCallback(() => {
