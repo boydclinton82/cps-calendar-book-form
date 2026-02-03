@@ -12,7 +12,7 @@ This milestone delivers three improvements to the booking calendar: fixing the p
 
 - [x] **Phase 1: Time Slot Fix** - Fix current hour visibility bug ✓
 - [x] **Phase 2: Quick Booking** - Add "Book Now" button for current hour ✓
-- [ ] **Phase 3: Timezone Display** - Add NSW timezone toggle
+- [x] **Phase 3: Timezone Display** - Add NSW timezone toggle ✓
 - [ ] **Phase 4: Deployment** - Deploy to all instances
 
 ## Phase Details
@@ -59,7 +59,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md - Add timezone toggle, DST detection, and display conversion
+- [x] 03-01-PLAN.md - Add timezone toggle, DST detection, and display conversion ✓
 
 ### Phase 4: Deployment
 **Goal**: All changes live on all 5 instances
@@ -83,8 +83,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
 | 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
-| 3. Timezone Display | 0/1 | Planned | - |
-| 4. Deployment | 0/1 | Planned | - |
+| 3. Timezone Display | 1/1 | ✓ Complete | 2026-02-04 |
+| 4. Deployment | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
