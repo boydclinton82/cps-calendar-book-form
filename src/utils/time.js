@@ -15,10 +15,17 @@ export function generateTimeSlots() {
   return slots;
 }
 
-export function formatHour(hour) {
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-  return `${displayHour}:00 ${period}`;
+export function formatHour(hour, useNSWTime = false) {
+  let displayHour = hour;
+
+  // Apply NSW offset during daylight saving (AEDT = +1h vs QLD)
+  if (useNSWTime && isNSWInDST()) {
+    displayHour = hour + 1;
+  }
+
+  const period = displayHour >= 12 ? 'PM' : 'AM';
+  const h = displayHour > 12 ? displayHour - 12 : displayHour === 0 ? 12 : displayHour;
+  return `${h}:00 ${period}`;
 }
 
 export function formatTimeKey(hour) {
@@ -91,4 +98,23 @@ export function isSlotBlocked(bookings, hour) {
     }
   }
   return { blocked: false };
+}
+
+// Timezone utilities for NSW/QLD display conversion
+
+// Detect if NSW is currently in Daylight Saving Time (AEDT vs AEST)
+export function isNSWInDST() {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    timeZoneName: 'short'
+  });
+  const parts = formatter.formatToParts(now);
+  const tzName = parts.find(part => part.type === 'timeZoneName')?.value;
+  return tzName === 'AEDT';
+}
+
+// Get the current offset label for NSW relative to QLD
+export function getNSWOffsetLabel() {
+  return isNSWInDST() ? '+1h' : '+0h';
 }
