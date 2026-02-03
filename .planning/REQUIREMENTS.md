@@ -9,7 +9,7 @@ Requirements for milestone v1.0: Universal Booking Improvements.
 
 ### Time Slots
 
-- [ ] **SLOT-01**: Current hour slot remains visible and bookable until the hour fully elapses (e.g., 9:00 slot visible until 9:59:59)
+- [x] **SLOT-01**: Current hour slot remains visible and bookable until the hour fully elapses (e.g., 9:00 slot visible until 9:59:59) ✓
 
 ### Quick Booking
 
@@ -61,7 +61,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SLOT-01 | Phase 1 | Pending |
+| SLOT-01 | Phase 1 | Complete |
 | BOOK-01 | Phase 2 | Pending |
 | BOOK-02 | Phase 2 | Pending |
 | BOOK-03 | Phase 2 | Pending |
