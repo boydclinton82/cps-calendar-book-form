@@ -13,6 +13,12 @@ Phase 2 adds a "Book Now" button to the header that allows instant booking of th
 3. Booking panel UI already supports pre-selection
 4. Availability checking logic handles all edge cases (booked, blocked, past)
 
+**Phase 1 Context (isSlotPast update):**
+Phase 1 updated `isSlotPast()` to check slot END time (hour + 1) instead of START time. This means:
+- At 10:15, the 10:00 slot is STILL available (becomes past at 11:00)
+- "Book Now" will work for the current hour at any minute during that hour
+- `isSlotPast(new Date(), currentHour)` returns false until the next hour begins
+
 The research confirms this is primarily a UI integration task that reuses existing patterns. The main technical consideration is determining button visibility based on current hour availability, which involves checking three conditions: not past, not booked, and not blocked by multi-hour bookings.
 
 **Primary recommendation:** Add button to Header component, connect to existing App.jsx state management, reuse BookingPanel with pre-selected slot.
@@ -138,7 +144,7 @@ Problems that look simple but have existing solutions:
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Check if hour is past | Custom comparison logic | `isSlotPast(date, hour)` from `utils/time.js` | Already handles edge cases, tested in production |
+| Check if hour is past | Custom comparison logic | `isSlotPast(date, hour)` from `utils/time.js` | Uses slot END time (hour+1), keeps current hour available until next hour begins |
 | Check slot availability | New availability function | `getSlotStatus()` from `useBookings` hook | Centralized logic checks booked + blocked states |
 | Determine current hour | `new Date().getHours()` in multiple places | Compute once in useMemo, reuse | Prevents inconsistency if computed at different times |
 | Open booking panel | New modal system | Existing `handleSlotSelect()` → `selectedSlot` state | BookingPanel already wired to this state |
@@ -148,10 +154,10 @@ Problems that look simple but have existing solutions:
 ## Common Pitfalls
 
 ### Pitfall 1: Stale Current Hour State
-**What goes wrong:** Button visibility doesn't update when hour changes (e.g., 9:59 → 10:00)
+**What goes wrong:** Button visibility doesn't update when hour changes (e.g., 10:59 → 11:00, the 10:00 slot should now be past)
 **Why it happens:** `useMemo` dependencies don't include time-based trigger
 **How to avoid:** Add `bookings` as dependency (already updates hourly via `useHourlyRefresh`), or add current date to useMemo if needed
-**Warning signs:** Button stays visible for past hour, or doesn't appear when hour becomes available
+**Warning signs:** Button stays visible for past hour (when next hour has begun), or doesn't appear when hour becomes available
 
 ### Pitfall 2: Multi-Hour Blocking Check Omitted
 **What goes wrong:** "Book Now" appears when current hour is blocked by earlier multi-hour booking
@@ -160,10 +166,12 @@ Problems that look simple but have existing solutions:
 **Warning signs:** Button visible at 11:00 when 10:00-12:00 booking exists
 
 ### Pitfall 3: Past Slot Check Missing
-**What goes wrong:** Button visible after current hour has elapsed (e.g., showing "Book 10:00" at 10:15)
+**What goes wrong:** Button visible for hours that have fully elapsed (e.g., showing "Book 9:00" at 10:15)
 **Why it happens:** Not using `isSlotPast()` check before showing button
 **How to avoid:** Check both `isSlotPast()` AND `getSlotStatus().status === 'available'`
-**Warning signs:** Button appears for current hour after minute 00
+**Warning signs:** Button appears for slots where the NEXT hour has already begun
+
+**NOTE (Phase 1 context):** `isSlotPast()` was updated to check slot END time, not START time. At 10:15, the 10:00 slot is STILL AVAILABLE (not past until 11:00). This is intentional - users can book the current hour at any point during that hour.
 
 ### Pitfall 4: Week View Confusion
 **What goes wrong:** "Book Now" tries to book current hour on wrong date when viewing different week
@@ -193,7 +201,8 @@ const currentHourAvailable = useMemo(() => {
   // Outside booking hours
   if (currentHour < START_HOUR || currentHour >= END_HOUR) return false;
 
-  // Check if past (handles same-hour edge case)
+  // Check if past - NOTE: isSlotPast uses slot END time (hour + 1)
+  // So at 10:15, isSlotPast(now, 10) returns false (slot available until 11:00)
   if (isSlotPast(now, currentHour)) return false;
 
   // Check booking status
