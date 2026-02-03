@@ -69,10 +69,10 @@ Plans:
   1. Template repo main branch contains all changes
   2. All 4 admin instances auto-deployed with new changes
   3. booking-eureka repo manually synced and deployed
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Push to template and sync to eureka
+- [ ] 04-01-PLAN.md - Push template repo and sync to eureka
 
 ## Progress
 
@@ -84,7 +84,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
 | 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
 | 3. Timezone Display | 0/1 | Planned | - |
-| 4. Deployment | 0/1 | Not started | - |
+| 4. Deployment | 0/1 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-04*
