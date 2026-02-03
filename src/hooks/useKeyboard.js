@@ -22,6 +22,8 @@ export function useKeyboard({
   onCancel,
   // General navigation
   onWeekToggle,
+  onBookNow,
+  onTimezoneToggle,
   onNavigate,
   onSlotFocusUp,
   onSlotFocusDown,
@@ -115,6 +117,20 @@ export function useKeyboard({
       return;
     }
 
+    // Book Now: B key
+    if (key === 'b' && onBookNow) {
+      e.preventDefault();
+      onBookNow();
+      return;
+    }
+
+    // Timezone toggle: T key
+    if (key === 't' && onTimezoneToggle) {
+      e.preventDefault();
+      onTimezoneToggle();
+      return;
+    }
+
     // Slot focus navigation: Up/Down arrows (day view only)
     if (e.key === 'ArrowUp' && onSlotFocusUp) {
       e.preventDefault();
@@ -147,7 +163,7 @@ export function useKeyboard({
         return;
       }
     }
-  }, [enabled, users, onPopupUserSelect, onPopupDurationSelect, onPopupDelete, onPopupClose, canPopupChangeDuration, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onNavigate, onSlotFocusUp, onSlotFocusDown, onSlotSelect, isWeekView]);
+  }, [enabled, users, onPopupUserSelect, onPopupDurationSelect, onPopupDelete, onPopupClose, canPopupChangeDuration, onUserSelect, onDurationSelect, onCancel, onWeekToggle, onBookNow, onTimezoneToggle, onNavigate, onSlotFocusUp, onSlotFocusDown, onSlotSelect, isWeekView]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
