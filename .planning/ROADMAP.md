@@ -11,7 +11,7 @@ This milestone delivers three improvements to the booking calendar: fixing the p
 - Decimal phases (e.g., 2.1): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Time Slot Fix** - Fix current hour visibility bug ✓
-- [ ] **Phase 2: Quick Booking** - Add "Book Now" button for current hour
+- [x] **Phase 2: Quick Booking** - Add "Book Now" button for current hour ✓
 - [ ] **Phase 3: Timezone Display** - Add NSW timezone toggle
 - [ ] **Phase 4: Deployment** - Deploy to all instances
 
@@ -44,7 +44,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md - Add Book Now button with availability logic
+- [x] 02-01-PLAN.md - Add Book Now button with availability logic ✓
 
 ### Phase 3: Timezone Display
 **Goal**: Users can view times in NSW timezone (AEDT/AEST) instead of QLD
@@ -82,7 +82,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
-| 2. Quick Booking | 0/1 | Planned | - |
+| 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
 | 3. Timezone Display | 0/1 | Planned | - |
 | 4. Deployment | 0/1 | Not started | - |
 

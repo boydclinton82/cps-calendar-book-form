@@ -13,9 +13,9 @@ Requirements for milestone v1.0: Universal Booking Improvements.
 
 ### Quick Booking
 
-- [ ] **BOOK-01**: User can click "Book Now" button to open booking panel for the current hour
-- [ ] **BOOK-02**: "Book Now" button only appears when current hour is available (not booked, not past, not blocked by multi-hour booking)
-- [ ] **BOOK-03**: "Book Now" reuses existing booking panel workflow (user selects name via hotkey, then duration)
+- [x] **BOOK-01**: User can click "Book Now" button to open booking panel for the current hour ✓
+- [x] **BOOK-02**: "Book Now" button only appears when current hour is available (not booked, not past, not blocked by multi-hour booking) ✓
+- [x] **BOOK-03**: "Book Now" reuses existing booking panel workflow (user selects name via hotkey, then duration) ✓
 
 ### Timezone Display
 
@@ -62,9 +62,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SLOT-01 | Phase 1 | Complete |
-| BOOK-01 | Phase 2 | Pending |
-| BOOK-02 | Phase 2 | Pending |
-| BOOK-03 | Phase 2 | Pending |
+| BOOK-01 | Phase 2 | Complete |
+| BOOK-02 | Phase 2 | Complete |
+| BOOK-03 | Phase 2 | Complete |
 | TIME-01 | Phase 3 | Pending |
 | TIME-02 | Phase 3 | Pending |
 | TIME-03 | Phase 3 | Pending |
