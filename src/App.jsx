@@ -8,7 +8,7 @@ import { useBookings } from './hooks/useBookings';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useHourlyRefresh } from './hooks/useHourlyRefresh';
 import { useConfig } from './hooks/useConfig';
-import { addDays, formatDate, END_HOUR, generateTimeSlots, isToday, isSlotPast } from './utils/time';
+import { addDays, formatDate, formatHour, formatTimeKey, START_HOUR, END_HOUR, generateTimeSlots, isToday, isSlotPast } from './utils/time';
 import './App.css';
 
 const TIME_SLOTS = generateTimeSlots();
@@ -46,6 +46,29 @@ function App() {
   // Auto-refresh on the hour to update past slots
   useHourlyRefresh();
 
+  // Compute if current hour is available for "Book Now" button
+  const currentHourAvailable = useMemo(() => {
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    // Outside booking hours?
+    if (currentHour < START_HOUR || currentHour >= END_HOUR) {
+      return false;
+    }
+
+    // Slot is past?
+    if (isSlotPast(now, currentHour)) {
+      return false;
+    }
+
+    // Check if slot is available (not booked, not blocked)
+    const todayKey = formatDate(now);
+    const timeKey = formatTimeKey(currentHour);
+    const status = getSlotStatus(todayKey, timeKey, currentHour);
+
+    return status.status === 'available';
+  }, [getSlotStatus, bookings]);
+
   // Navigation - 7 days for week view, 1 day for day view
   const handleNavigate = useCallback((direction) => {
     const daysToMove = isWeekView ? 7 : 1;
@@ -65,6 +88,19 @@ function App() {
     setCurrentDate(date);
     setIsWeekView(false);
   }, []);
+
+  // Handle "Book Now" button - books current hour
+  const handleBookNow = useCallback(() => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const slot = {
+      hour: currentHour,
+      time: formatHour(currentHour),
+      key: formatTimeKey(currentHour),
+      dateKey: formatDate(now),
+    };
+    handleSlotSelect(slot);
+  }, [handleSlotSelect]);
 
   // Slot selection
   const handleSlotSelect = useCallback((slot) => {
@@ -278,6 +314,8 @@ function App() {
         onNavigate={handleNavigate}
         onWeekToggle={handleWeekToggle}
         isWeekView={isWeekView}
+        showBookNow={currentHourAvailable}
+        onBookNow={handleBookNow}
       />
 
       <main className="main-content">
