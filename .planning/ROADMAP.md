@@ -56,10 +56,10 @@ Plans:
   3. Toggle shows current offset indicator (e.g., "NSW +1h" vs "QLD")
   4. Closing and reopening browser retains toggle preference
   5. Actual bookings stored in QLD time regardless of display setting
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: Add timezone toggle with display conversion
+- [ ] 03-01-PLAN.md - Add timezone toggle, DST detection, and display conversion
 
 ### Phase 4: Deployment
 **Goal**: All changes live on all 5 instances
@@ -83,7 +83,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
 | 2. Quick Booking | 0/1 | Planned | - |
-| 3. Timezone Display | 0/1 | Not started | - |
+| 3. Timezone Display | 0/1 | Planned | - |
 | 4. Deployment | 0/1 | Not started | - |
 
 ---
