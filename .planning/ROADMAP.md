@@ -41,10 +41,10 @@ Plans:
   3. "Book Now" button hidden when current hour is blocked by multi-hour booking
   4. Clicking "Book Now" opens existing booking panel with current hour pre-selected
   5. Booking flow works identically to clicking a slot (hotkey name selection, then duration)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: Add Book Now button with availability logic
+- [ ] 02-01-PLAN.md - Add Book Now button with availability logic
 
 ### Phase 3: Timezone Display
 **Goal**: Users can view times in NSW timezone (AEDT/AEST) instead of QLD
@@ -82,7 +82,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Time Slot Fix | 0/1 | Planned | - |
-| 2. Quick Booking | 0/1 | Not started | - |
+| 2. Quick Booking | 0/1 | Planned | - |
 | 3. Timezone Display | 0/1 | Not started | - |
 | 4. Deployment | 0/1 | Not started | - |
 
