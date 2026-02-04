@@ -13,7 +13,7 @@ This milestone delivers three improvements to the booking calendar: fixing the p
 - [x] **Phase 1: Time Slot Fix** - Fix current hour visibility bug ✓
 - [x] **Phase 2: Quick Booking** - Add "Book Now" button for current hour ✓
 - [x] **Phase 3: Timezone Display** - Add NSW timezone toggle ✓
-- [ ] **Phase 4: Deployment** - Deploy to all instances
+- [x] **Phase 4: Deployment** - Deploy to admin instances ✓ (eureka separate)
 
 ## Phase Details
 
@@ -74,7 +74,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md - Push template repo and sync to eureka
+- [x] 04-01-PLAN.md - Push template repo to admin instances ✓ (eureka excluded - separate architecture)
 
 ## Progress
 
@@ -86,7 +86,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
 | 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
 | 3. Timezone Display | 3/3 | ✓ Complete | 2026-02-04 |
-| 4. Deployment | 0/1 | Not started | - |
+| 4. Deployment | 1/1 | ✓ Complete | 2026-02-04 |
 
 ---
 *Roadmap created: 2026-02-04*
