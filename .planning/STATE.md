@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 8 in progress — Architecture Documentation (plan 01 of 04 complete)
+**Current focus:** Phase 8 in progress — Architecture Documentation (plan 03 of 04 complete)
 
 ## Current Position
 
 Phase: 8 of 10 (Architecture Documentation)
-Plan: 1 of 4 in current phase
-Status: In progress — 1/4 plans complete (ARCH-01 Data Storage, ARCH-05 Instance Config)
-Last activity: 2026-02-13 — Completed 08-01-PLAN.md (Data Storage & Instance Configuration)
+Plan: 3 of 4 in current phase
+Status: In progress — 3/4 plans complete (ARCH-01 Data Storage, ARCH-05 Instance Config, ARCH-03 Polling, ARCH-04 State)
+Last activity: 2026-02-13 — Completed 08-03-PLAN.md (Polling Sync & State Management)
 
-Progress: [███████░░░] 70% (7 phases complete + 1/4 current phase plans)
+Progress: [███████░░░] 75% (7 phases complete + 3/4 current phase plans)
 
 ## Accumulated Context
 
@@ -51,6 +51,10 @@ Progress: [███████░░░] 70% (7 phases complete + 1/4 current 
 | Namespace isolation via slug-based key prefixes | Multiple teams can share same KV database with complete data separation | 08-01 | Each instance reads/writes to `instance:{slug}:*` keys only |
 | Read-modify-write pattern for all updates | Full object replacement on every write operation | 08-01 | Simplifies KV usage, acceptable for low-concurrency booking system |
 | Graceful fallback configuration | Hardcoded fallback config when API unavailable | 08-01 | Application must never crash due to missing configuration |
+| Polling over WebSockets | Simple implementation for low-concurrency booking app | 08-03 | Maximum 7-second latency acceptable, no WebSocket connection management |
+| Complete state replacement (no diffing) | Polling replaces entire bookings object on every tick | 08-03 | Simpler than tracking individual changes, catches all creates/updates/deletes |
+| Optimistic updates for all operations | Makes UI feel instant, errors self-correct via triggerSync | 08-03 | Most operations succeed, rollback on conflict keeps state consistent |
+| Strict state initialization order | Config loads before bookings, bookings load before polling starts | 08-03 | Dependencies must be satisfied for validation and sync to work correctly |
 
 ### Pending Todos
 
@@ -63,7 +67,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 08-01-PLAN.md — Data Storage and Instance Configuration documentation
+Stopped at: Completed 08-03-PLAN.md — Polling Sync and State Management documentation
 Resume file: None
 
 ---
