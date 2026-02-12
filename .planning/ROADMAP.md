@@ -88,10 +88,11 @@ Plans:
   6. Screenshots exist showing both QLD and NSW timezone display modes with offset indicator
   7. Screenshots exist showing responsive layout at mobile/tablet breakpoints
   8. All screenshots are annotated with labels identifying interactive elements and state descriptions
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD (to be planned)
+- [ ] 05-01-PLAN.md — Setup Playwright/Sharp, capture all raw screenshots (VCAP-01 through VCAP-07)
+- [ ] 05-02-PLAN.md — Annotate screenshots with labels, create manifest (VCAP-08)
 
 #### Phase 6: Code Extraction
 **Goal**: Clean reference code extracted from React implementation and documented
@@ -176,7 +177,7 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 2. Quick Booking | v1.0 | 1/1 | Complete | 2026-02-04 |
 | 3. Timezone Display | v1.0 | 3/3 | Complete | 2026-02-04 |
 | 4. Deployment | v1.0 | 1/1 | Complete | 2026-02-04 |
-| 5. Visual Capture | v2.0 | 0/TBD | Not started | - |
+| 5. Visual Capture | v2.0 | 0/2 | Planned | - |
 | 6. Code Extraction | v2.0 | 0/TBD | Not started | - |
 | 7. UI/UX Documentation | v2.0 | 0/TBD | Not started | - |
 | 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
