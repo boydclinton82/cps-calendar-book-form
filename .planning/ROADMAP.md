@@ -137,10 +137,12 @@ Plans:
   3. Polling mechanism documented (interval timing, what triggers polls, conflict detection logic)
   4. Application state documented (what state exists, how it flows, what triggers updates)
   5. Instance configuration documented (environment variables, per-instance settings, differences between instances)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 08-01: TBD (to be planned)
+- [ ] 08-01-PLAN.md — Data storage schema and instance configuration (ARCH-01, ARCH-05)
+- [ ] 08-02-PLAN.md — API endpoint contracts with validation and error handling (ARCH-02)
+- [ ] 08-03-PLAN.md — Polling sync mechanism and application state management (ARCH-03, ARCH-04)
 
 #### Phase 9: Functional Documentation
 **Goal**: All behaviors and edge cases documented as technology-neutral specifications
@@ -184,11 +186,11 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 5. Visual Capture | v2.0 | 2/2 | Complete | 2026-02-13 |
 | 6. Code Extraction | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 7. UI/UX Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
-| 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
+| 8. Architecture Documentation | v2.0 | 0/3 | Planned | - |
 | 9. Functional Documentation | v2.0 | 0/TBD | Not started | - |
 | 10. Master Spec Assembly | v2.0 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13 — Phase 7 complete*
+*Last updated: 2026-02-13 — Phase 8 planned*
