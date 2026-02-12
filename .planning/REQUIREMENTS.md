@@ -29,11 +29,11 @@ Requirements for milestone v2.0: Booking Spec Package.
 
 ### Architecture & Data
 
-- [ ] **ARCH-01**: Document data storage schema (Vercel KV key structure, booking data format)
-- [ ] **ARCH-02**: Document all API endpoints with request/response formats and error handling
-- [ ] **ARCH-03**: Document polling mechanism (interval, triggers, conflict detection)
-- [ ] **ARCH-04**: Document application state management (what state exists, how it flows between components)
-- [ ] **ARCH-05**: Document instance configuration (environment variables, per-instance settings, how instances differ)
+- [x] **ARCH-01**: Document data storage schema (Vercel KV key structure, booking data format)
+- [x] **ARCH-02**: Document all API endpoints with request/response formats and error handling
+- [x] **ARCH-03**: Document polling mechanism (interval, triggers, conflict detection)
+- [x] **ARCH-04**: Document application state management (what state exists, how it flows between components)
+- [x] **ARCH-05**: Document instance configuration (environment variables, per-instance settings, how instances differ)
 
 ### Functional Specification
 
@@ -92,11 +92,11 @@ Deferred to later milestones.
 | UIUX-04 | Phase 7 | Complete |
 | UIUX-05 | Phase 7 | Complete |
 | UIUX-06 | Phase 7 | Complete |
-| ARCH-01 | Phase 8 | Pending |
-| ARCH-02 | Phase 8 | Pending |
-| ARCH-03 | Phase 8 | Pending |
-| ARCH-04 | Phase 8 | Pending |
-| ARCH-05 | Phase 8 | Pending |
+| ARCH-01 | Phase 8 | Complete |
+| ARCH-02 | Phase 8 | Complete |
+| ARCH-03 | Phase 8 | Complete |
+| ARCH-04 | Phase 8 | Complete |
+| ARCH-05 | Phase 8 | Complete |
 | FUNC-01 | Phase 9 | Pending |
 | FUNC-02 | Phase 9 | Pending |
 | FUNC-03 | Phase 9 | Pending |
@@ -116,4 +116,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-02-13*
-*Traceability updated: 2026-02-13 — Phase 7 UIUX requirements complete*
+*Traceability updated: 2026-02-13 — Phase 8 ARCH requirements complete*
