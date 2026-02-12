@@ -1,0 +1,256 @@
+.booking-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Position-based user styles - User 1 (Green) */
+.booking-block.user-1 {
+  background: rgba(var(--user-1-rgb), 0.35);
+  border: 1px solid rgba(var(--user-1-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-1-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-1-rgb), 0.05);
+}
+
+.booking-block.user-1 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-1-color);
+  text-shadow: 0 0 6px rgba(var(--user-1-rgb), 0.4);
+}
+
+.booking-block.user-1:hover {
+  background: rgba(var(--user-1-rgb), 0.18);
+  border-color: rgba(var(--user-1-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-1-rgb), 0.5),
+    0 0 32px rgba(var(--user-1-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-1-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-1:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-1-rgb), 0.5);
+}
+
+.booking-block.user-1:focus {
+  outline: 2px solid rgba(var(--user-1-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Position-based user styles - User 2 (Magenta) */
+.booking-block.user-2 {
+  background: rgba(var(--user-2-rgb), 0.35);
+  border: 1px solid rgba(var(--user-2-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-2-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-2-rgb), 0.05);
+}
+
+.booking-block.user-2 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-2-color);
+  text-shadow: 0 0 6px rgba(var(--user-2-rgb), 0.4);
+}
+
+.booking-block.user-2:hover {
+  background: rgba(var(--user-2-rgb), 0.18);
+  border-color: rgba(var(--user-2-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-2-rgb), 0.5),
+    0 0 32px rgba(var(--user-2-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-2-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-2:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-2-rgb), 0.5);
+}
+
+.booking-block.user-2:focus {
+  outline: 2px solid rgba(var(--user-2-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Position-based user styles - User 3 (Gold) */
+.booking-block.user-3 {
+  background: rgba(var(--user-3-rgb), 0.35);
+  border: 1px solid rgba(var(--user-3-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-3-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-3-rgb), 0.05);
+}
+
+.booking-block.user-3 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-3-color);
+  text-shadow: 0 0 6px rgba(var(--user-3-rgb), 0.4);
+}
+
+.booking-block.user-3:hover {
+  background: rgba(var(--user-3-rgb), 0.18);
+  border-color: rgba(var(--user-3-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-3-rgb), 0.5),
+    0 0 32px rgba(var(--user-3-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-3-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-3:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-3-rgb), 0.5);
+}
+
+.booking-block.user-3:focus {
+  outline: 2px solid rgba(var(--user-3-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Position-based user styles - User 4 (Purple) */
+.booking-block.user-4 {
+  background: rgba(var(--user-4-rgb), 0.35);
+  border: 1px solid rgba(var(--user-4-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-4-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-4-rgb), 0.05);
+}
+
+.booking-block.user-4 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-4-color);
+  text-shadow: 0 0 6px rgba(var(--user-4-rgb), 0.4);
+}
+
+.booking-block.user-4:hover {
+  background: rgba(var(--user-4-rgb), 0.18);
+  border-color: rgba(var(--user-4-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-4-rgb), 0.5),
+    0 0 32px rgba(var(--user-4-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-4-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-4:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-4-rgb), 0.5);
+}
+
+.booking-block.user-4:focus {
+  outline: 2px solid rgba(var(--user-4-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Position-based user styles - User 5 (Coral) */
+.booking-block.user-5 {
+  background: rgba(var(--user-5-rgb), 0.35);
+  border: 1px solid rgba(var(--user-5-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-5-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-5-rgb), 0.05);
+}
+
+.booking-block.user-5 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-5-color);
+  text-shadow: 0 0 6px rgba(var(--user-5-rgb), 0.4);
+}
+
+.booking-block.user-5:hover {
+  background: rgba(var(--user-5-rgb), 0.18);
+  border-color: rgba(var(--user-5-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-5-rgb), 0.5),
+    0 0 32px rgba(var(--user-5-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-5-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-5:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-5-rgb), 0.5);
+}
+
+.booking-block.user-5:focus {
+  outline: 2px solid rgba(var(--user-5-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Position-based user styles - User 6 (Rose) */
+.booking-block.user-6 {
+  background: rgba(var(--user-6-rgb), 0.35);
+  border: 1px solid rgba(var(--user-6-rgb), 0.6);
+  box-shadow:
+    0 0 8px rgba(var(--user-6-rgb), 0.3),
+    inset 0 0 12px rgba(var(--user-6-rgb), 0.05);
+}
+
+.booking-block.user-6 .booking-block-info {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--user-6-color);
+  text-shadow: 0 0 6px rgba(var(--user-6-rgb), 0.4);
+}
+
+.booking-block.user-6:hover {
+  background: rgba(var(--user-6-rgb), 0.18);
+  border-color: rgba(var(--user-6-rgb), 0.8);
+  box-shadow:
+    0 0 16px rgba(var(--user-6-rgb), 0.5),
+    0 0 32px rgba(var(--user-6-rgb), 0.2),
+    inset 0 0 20px rgba(var(--user-6-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-block.user-6:hover .booking-block-info {
+  text-shadow: 0 0 10px rgba(var(--user-6-rgb), 0.5);
+}
+
+.booking-block.user-6:focus {
+  outline: 2px solid rgba(var(--user-6-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+.booking-block-info {
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: text-shadow var(--transition-fast);
+}
+
+.booking-block-cancel-hint {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  text-align: center;
+}
+
+.booking-block:hover .booking-block-cancel-hint {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .booking-block {
+    padding: 10px 16px;
+  }
+
+  .booking-block-info {
+    font-size: 0.8rem;
+  }
+
+  .booking-block-cancel-hint {
+    font-size: 0.7rem;
+  }
+}

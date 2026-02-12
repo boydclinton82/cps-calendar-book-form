@@ -1,0 +1,161 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading state */
+.app.app-loading {
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error state */
+.app.app-error {
+  justify-content: center;
+  align-items: center;
+}
+
+.error-message {
+  text-align: center;
+  padding: 32px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  max-width: 400px;
+}
+
+.error-message h2 {
+  color: #FF6B6B;
+  margin-bottom: 12px;
+}
+
+.error-message p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.error-message button {
+  background: var(--accent);
+  color: var(--bg-primary);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.error-message button:hover {
+  opacity: 0.9;
+}
+
+.main-content {
+  display: flex;
+  position: relative;
+}
+
+.view-container {
+  display: flex;
+  overflow: auto;
+  width: 100%;
+}
+
+.view-container.day {
+  justify-content: center;
+  padding-top: 12px;
+  padding-bottom: 8px;
+}
+
+.view-container.week {
+  padding: 8px;
+  width: 100%;
+}
+
+/* Transition between views */
+.view-container.day > * {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+.view-container.week > * {
+  animation: expandIn 0.4s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Panel overlay for mobile */
+.panel-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .panel-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Ensure proper spacing when panel is open */
+@media (min-width: 769px) {
+  .main-content:has(.booking-panel.open) .view-container.day {
+    margin-right: 340px;
+    transition: margin-right var(--transition-medium);
+  }
+}

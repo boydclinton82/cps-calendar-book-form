@@ -1,0 +1,33 @@
+/* Glass container for time slots (matching reference - darker interior) */
+.time-strip {
+  padding: 12px;
+  width: 360px;
+  min-width: 360px;
+  max-width: 360px;
+  background: rgba(10, 20, 35, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 229, 229, 0.25);
+  box-shadow:
+    0 0 40px rgba(0, 229, 229, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Container for slots with overlay positioning */
+.time-strip .slots-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .time-strip {
+    max-width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    margin: 0 12px;
+  }
+}
