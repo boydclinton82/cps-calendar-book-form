@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 6 of 10 (Code Extraction)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-13 — Completed 06-01-PLAN.md (code extraction)
+Last activity: 2026-02-13 — Completed 06-02-PLAN.md (file manifest)
 
-Progress: [█████░░░░░] 50% (5 phases complete, 1/3 of phase 6)
+Progress: [█████░░░░░] 60% (5 phases complete, 2/3 of phase 6)
 
 ## Accumulated Context
 
@@ -34,6 +34,9 @@ Progress: [█████░░░░░] 50% (5 phases complete, 1/3 of phase 
 | Remove unused exports | Clean reference better than "just in case" preservation | 06-01 | Code extraction |
 | CSS as visual reference | Color/spacing patterns transfer, syntax doesn't | 06-01 | Rails implementation |
 | Exclude /versions/ code | Only current working code relevant for spec | 06-01 | Code extraction |
+| Explicit data structures | AI consumer needs clear schema, implicit shapes are error-prone | 06-02 | Rails implementation |
+| API contracts with examples | Stable interface between React and Rails requires explicit documentation | 06-02 | Rails implementation |
+| Storage as abstract interface | Document what (operations), not how (implementation) for portability | 06-02 | Rails implementation |
 
 ### Pending Todos
 
@@ -46,7 +49,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 06-01-PLAN.md (code extraction with dead code removed)
+Stopped at: Completed 06-02-PLAN.md (file manifest creation)
 Resume file: None
 
 ---
