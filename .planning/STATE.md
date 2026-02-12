@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 7 in progress — UI/UX documentation (layout & design tokens complete)
+**Current focus:** Phase 7 in progress — UI/UX documentation (layout, tokens, component states, animations complete)
 
 ## Current Position
 
 Phase: 7 of 10 (UI/UX Documentation)
-Plan: 3 of 6 in current phase
-Status: In progress — interaction systems documented (keyboard shortcuts + responsive behavior)
-Last activity: 2026-02-13 — Completed 07-03-PLAN.md
+Plan: 2 of 6 in current phase
+Status: In progress — component states and animations documented
+Last activity: 2026-02-13 — Completed 07-02-PLAN.md
 
-Progress: [██████▓░░░] 63% (6 phases complete, 7 started, 3/6 plans in phase 7)
+Progress: [██████▓░░░] 62% (6 phases complete, 7 started, 2/6 plans in phase 7)
 
 ## Accumulated Context
 
@@ -43,10 +43,9 @@ Progress: [██████▓░░░] 63% (6 phases complete, 7 started, 3/
 | Layout docs before component states | Component state docs need to reference WHERE components exist (layout regions) and WHAT visual values they use (design tokens) | 07-01 | All remaining UI/UX docs |
 | Exhaustive token extraction | Rails needs ALL visual values (not just CSS custom properties) including hardcoded colors from component CSS | 07-01 | Rails implementation |
 | Include both hex and RGB | CSS rgba() needs RGB triplet, but hex is more readable for solid colors; Rails shouldn't convert | 07-01 | Rails implementation |
-| Context-aware keyboard modes | Three mutually exclusive keyboard modes with priority hierarchy (popup > panel > navigation) | 07-03 | Rails keyboard handler |
-| Dynamic user hotkeys | User hotkeys read from config, not hardcoded in UI | 07-03 | Rails configuration system |
-| Mobile full-screen overlays | Panel and popup become 100% width on ≤768px with backdrop | 07-03 | Rails mobile UI |
-| Hidden keyboard UI mobile | Hide keyboard hints bar and week toggle on ≤600px | 07-03 | Rails responsive CSS |
+| Document keyboard-focused state from CSS only | Phase 5 screenshots captured mouse interactions; keyboard focus state exists in CSS but wasn't photographed | 07-02 | Rails has complete state coverage including keyboard navigation |
+| Include both hex and RGB for user colors | Booking blocks use rgba(var(--user-N-rgb), 0.35) pattern requiring RGB triplets | 07-02 | Complete color specifications ready for direct implementation |
+| Document glass morphism in ANIMATIONS.md | Backdrop-filter blur is critical visual effect but not technically an "animation" | 07-02 | Developers understand glass effect as motion-adjacent (blur affects perception of depth/layering) |
 
 ### Pending Todos
 
@@ -59,7 +58,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed Phase 7 Plan 03 (KEYBOARD-SHORTCUTS.md + RESPONSIVE-BEHAVIOR.md)
+Stopped at: Completed Phase 7 Plan 02 (COMPONENT-STATES.md + ANIMATIONS.md)
 Resume file: None
 
 ---
