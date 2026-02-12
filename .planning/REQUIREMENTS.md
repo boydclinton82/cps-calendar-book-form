@@ -45,9 +45,9 @@ Requirements for milestone v2.0: Booking Spec Package.
 
 ### Reference Code
 
-- [ ] **CODE-01**: Extract all source files powering the current single version, stripped of dead code
-- [ ] **CODE-02**: Create file manifest documenting what each file/function does
-- [ ] **CODE-03**: Annotate key logic sections with technology-neutral explanations
+- [x] **CODE-01**: Extract all source files powering the current single version, stripped of dead code
+- [x] **CODE-02**: Create file manifest documenting what each file/function does
+- [x] **CODE-03**: Annotate key logic sections with technology-neutral explanations
 
 ### Master Specification
 
@@ -102,9 +102,9 @@ Deferred to later milestones.
 | FUNC-03 | Phase 9 | Pending |
 | FUNC-04 | Phase 9 | Pending |
 | FUNC-05 | Phase 9 | Pending |
-| CODE-01 | Phase 6 | Pending |
-| CODE-02 | Phase 6 | Pending |
-| CODE-03 | Phase 6 | Pending |
+| CODE-01 | Phase 6 | Complete |
+| CODE-02 | Phase 6 | Complete |
+| CODE-03 | Phase 6 | Complete |
 | SPEC-01 | Phase 10 | Pending |
 | SPEC-02 | Phase 10 | Pending |
 | SPEC-03 | Phase 10 | Pending |
