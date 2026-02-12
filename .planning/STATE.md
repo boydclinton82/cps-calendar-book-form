@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 7 complete — ready for Phase 8 (Architecture Documentation)
+**Current focus:** Phase 8 in progress — Architecture Documentation (plan 02 of 04 complete)
 
 ## Current Position
 
-Phase: 7 of 10 (UI/UX Documentation)
-Plan: 3 of 3 in current phase
-Status: Phase complete — verified 6/6 must-haves
-Last activity: 2026-02-13 — Phase 7 verified and complete
+Phase: 8 of 10 (Architecture Documentation)
+Plan: 2 of 4 in current phase
+Status: In progress — 2/4 plans complete (ARCH-01, ARCH-02)
+Last activity: 2026-02-13 — Completed 08-02-PLAN.md (API Contracts)
 
-Progress: [███████░░░] 70% (7 phases complete)
+Progress: [███████░░░] 70% (7 phases complete + 2/4 current phase plans)
 
 ## Accumulated Context
 
@@ -48,6 +48,11 @@ Progress: [███████░░░] 70% (7 phases complete)
 | Document glass morphism in ANIMATIONS.md | Backdrop-filter blur is critical visual effect but not technically an "animation" | 07-02 | Developers understand glass effect as motion-adjacent |
 | Context-aware keyboard modes | Three mutually exclusive modes prevent shortcut conflicts and make behavior predictable | 07-03 | Rails implementation |
 | Dynamic user hotkeys from config | Configuration-driven hotkeys allow different deployments to customize per their user roster | 07-03 | Rails implementation |
+| Security middleware as cross-cutting concern | All endpoints wrapped with withSecurity() applying headers, CORS, rate limiting uniformly | 08-02 | Rails must replicate exact security behavior |
+| Conflict detection checks only new slots on update | PUT only validates slots beyond current duration when extending; shrinking/user changes skip check | 08-02 | Rails must match two-phase update logic |
+| Fail-open rate limiting | If KV check errors, request allowed rather than rejected to prevent outage | 08-02 | Rails must implement same fault tolerance |
+| Input sanitization before validation | Invalid fields set to null, then validation checks for null rather than rejecting entire request | 08-02 | Rails must match two-phase approach |
+| Date key cleanup on deletion | DELETE removes empty date objects from bookings structure to prevent storage bloat | 08-02 | Rails must implement identical cleanup |
 
 ### Pending Todos
 
@@ -60,7 +65,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 7 complete — all 3 plans executed, verified 6/6 must-haves
+Stopped at: Completed 08-02-PLAN.md — API contracts documentation with 5 operations, 27 error examples, conflict detection logic
 Resume file: None
 
 ---
