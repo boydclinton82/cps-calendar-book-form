@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 5 - Visual Capture (starting v2.0 Booking Spec Package)
+**Current focus:** Phase 6 - Code Extraction (clean codebase reference)
 
 ## Current Position
 
-Phase: 5 of 10 (Visual Capture)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-13 — Completed 05-02-PLAN.md (screenshot annotation)
+Phase: 6 of 10 (Code Extraction)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-13 — Completed 06-01-PLAN.md (code extraction)
 
-Progress: [█████░░░░░] 50% (5 phases complete)
+Progress: [█████░░░░░] 50% (5 phases complete, 1/3 of phase 6)
 
 ## Accumulated Context
 
@@ -31,6 +31,9 @@ Progress: [█████░░░░░] 50% (5 phases complete)
 | Category-based screenshot organization | Map screenshots directly to VCAP requirements for traceability | 05-01 | Phase 05-07 |
 | Hardcoded annotation positions | Manual positioning ensures accuracy vs auto-detection for AI consumer | 05-02 | Annotation script |
 | Red text on dark backgrounds | High contrast for dark theme app readability | 05-02 | Screenshot annotations |
+| Remove unused exports | Clean reference better than "just in case" preservation | 06-01 | Code extraction |
+| CSS as visual reference | Color/spacing patterns transfer, syntax doesn't | 06-01 | Rails implementation |
+| Exclude /versions/ code | Only current working code relevant for spec | 06-01 | Code extraction |
 
 ### Pending Todos
 
@@ -43,7 +46,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 05-02-PLAN.md (screenshot annotation - Phase 5 complete)
+Stopped at: Completed 06-01-PLAN.md (code extraction with dead code removed)
 Resume file: None
 
 ---
