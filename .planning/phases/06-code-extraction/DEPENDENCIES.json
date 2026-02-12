@@ -1,0 +1,97 @@
+{
+  "App.css": [],
+  "App.jsx": [
+    "App.css",
+    "components/BookingPanel.jsx",
+    "components/BookingPopup.jsx",
+    "components/Header.jsx",
+    "components/TimeStrip.jsx",
+    "components/WeekView.jsx",
+    "hooks/useBookings.js",
+    "hooks/useConfig.js",
+    "hooks/useHourlyRefresh.js",
+    "hooks/useKeyboard.js",
+    "utils/storage.js",
+    "utils/time.js"
+  ],
+  "components/BookingBlock.css": [],
+  "components/BookingBlock.jsx": [
+    "components/BookingBlock.css",
+    "utils/colors.js",
+    "utils/time.js"
+  ],
+  "components/BookingOverlay.css": [],
+  "components/BookingOverlay.jsx": [
+    "components/BookingBlock.jsx",
+    "components/BookingOverlay.css"
+  ],
+  "components/BookingPanel.css": [],
+  "components/BookingPanel.jsx": [
+    "components/BookingPanel.css",
+    "hooks/useKeyboard.js",
+    "utils/time.js"
+  ],
+  "components/BookingPopup.css": [],
+  "components/BookingPopup.jsx": [
+    "components/BookingPopup.css",
+    "hooks/useKeyboard.js"
+  ],
+  "components/Header.css": [],
+  "components/Header.jsx": [
+    "components/Header.css",
+    "utils/time.js"
+  ],
+  "components/TimeSlot.css": [],
+  "components/TimeSlot.jsx": [
+    "components/TimeSlot.css",
+    "utils/time.js"
+  ],
+  "components/TimeStrip.css": [],
+  "components/TimeStrip.jsx": [
+    "components/BookingOverlay.jsx",
+    "components/TimeSlot.jsx",
+    "components/TimeStrip.css",
+    "utils/time.js"
+  ],
+  "components/WeekBookingBlock.css": [],
+  "components/WeekBookingBlock.jsx": [
+    "components/WeekBookingBlock.css",
+    "utils/colors.js",
+    "utils/time.js"
+  ],
+  "components/WeekDayOverlay.css": [],
+  "components/WeekDayOverlay.jsx": [
+    "components/WeekBookingBlock.jsx",
+    "components/WeekDayOverlay.css"
+  ],
+  "components/WeekView.css": [],
+  "components/WeekView.jsx": [
+    "components/WeekDayOverlay.jsx",
+    "components/WeekView.css",
+    "utils/time.js"
+  ],
+  "context/ConfigContext.jsx": [
+    "services/api.js"
+  ],
+  "hooks/useBookings.js": [
+    "hooks/usePollingSync.js",
+    "services/api.js",
+    "utils/time.js"
+  ],
+  "hooks/useConfig.js": [
+    "context/ConfigContext.jsx"
+  ],
+  "hooks/useHourlyRefresh.js": [],
+  "hooks/useKeyboard.js": [],
+  "hooks/usePollingSync.js": [],
+  "index.css": [],
+  "main.jsx": [
+    "App.jsx",
+    "context/ConfigContext.jsx",
+    "index.css"
+  ],
+  "services/api.js": [],
+  "utils/colors.js": [],
+  "utils/storage.js": [],
+  "utils/time.js": []
+}

@@ -1,0 +1,6 @@
+{
+  "entry": ["src/main.jsx", "api/**/*.js"],
+  "project": ["src/**/*.{js,jsx}", "api/**/*.js"],
+  "ignore": ["versions/**", "dist/**", "scripts/**", "node_modules/**"],
+  "ignoreDependencies": ["@vitejs/plugin-react"]
+}
