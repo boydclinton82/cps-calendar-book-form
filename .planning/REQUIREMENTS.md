@@ -9,14 +9,14 @@ Requirements for milestone v2.0: Booking Spec Package.
 
 ### Visual Capture
 
-- [ ] **VCAP-01**: Screenshot of initial load state (empty calendar, no date selected)
-- [ ] **VCAP-02**: Screenshot of calendar with date selected showing time slot grid
-- [ ] **VCAP-03**: Screenshots of all slot visual states (available, booked, past, current hour, blocked by multi-hour)
-- [ ] **VCAP-04**: Screenshots of complete booking flow (panel open → name selection → duration → confirmation)
-- [ ] **VCAP-05**: Screenshots of Book Now button (visible state and hidden state with reasons)
-- [ ] **VCAP-06**: Screenshots of timezone toggle (QLD default and NSW active with offset indicator)
-- [ ] **VCAP-07**: Screenshots of mobile/responsive view at key breakpoints
-- [ ] **VCAP-08**: All screenshots annotated with interactive elements and state descriptions
+- [x] **VCAP-01**: Screenshot of initial load state (empty calendar, no date selected)
+- [x] **VCAP-02**: Screenshot of calendar with date selected showing time slot grid
+- [x] **VCAP-03**: Screenshots of all slot visual states (available, booked, past, current hour, blocked by multi-hour)
+- [x] **VCAP-04**: Screenshots of complete booking flow (panel open → name selection → duration → confirmation)
+- [x] **VCAP-05**: Screenshots of Book Now button (visible state and hidden state with reasons)
+- [x] **VCAP-06**: Screenshots of timezone toggle (QLD default and NSW active with offset indicator)
+- [x] **VCAP-07**: Screenshots of mobile/responsive view at key breakpoints
+- [x] **VCAP-08**: All screenshots annotated with interactive elements and state descriptions
 
 ### UI/UX Specification
 
@@ -78,14 +78,14 @@ Deferred to later milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VCAP-01 | Phase 5 | Pending |
-| VCAP-02 | Phase 5 | Pending |
-| VCAP-03 | Phase 5 | Pending |
-| VCAP-04 | Phase 5 | Pending |
-| VCAP-05 | Phase 5 | Pending |
-| VCAP-06 | Phase 5 | Pending |
-| VCAP-07 | Phase 5 | Pending |
-| VCAP-08 | Phase 5 | Pending |
+| VCAP-01 | Phase 5 | Complete |
+| VCAP-02 | Phase 5 | Complete |
+| VCAP-03 | Phase 5 | Complete |
+| VCAP-04 | Phase 5 | Complete |
+| VCAP-05 | Phase 5 | Complete |
+| VCAP-06 | Phase 5 | Complete |
+| VCAP-07 | Phase 5 | Complete |
+| VCAP-08 | Phase 5 | Complete |
 | UIUX-01 | Phase 7 | Pending |
 | UIUX-02 | Phase 7 | Pending |
 | UIUX-03 | Phase 7 | Pending |

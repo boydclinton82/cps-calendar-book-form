@@ -91,8 +91,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Setup Playwright/Sharp, capture all raw screenshots (VCAP-01 through VCAP-07)
-- [ ] 05-02-PLAN.md — Annotate screenshots with labels, create manifest (VCAP-08)
+- [x] 05-01-PLAN.md — Setup Playwright/Sharp, capture all raw screenshots (VCAP-01 through VCAP-07) ✓
+- [x] 05-02-PLAN.md — Annotate screenshots with labels, create manifest (VCAP-08) ✓
 
 #### Phase 6: Code Extraction
 **Goal**: Clean reference code extracted from React implementation and documented
@@ -177,7 +177,7 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 2. Quick Booking | v1.0 | 1/1 | Complete | 2026-02-04 |
 | 3. Timezone Display | v1.0 | 3/3 | Complete | 2026-02-04 |
 | 4. Deployment | v1.0 | 1/1 | Complete | 2026-02-04 |
-| 5. Visual Capture | v2.0 | 0/2 | Planned | - |
+| 5. Visual Capture | v2.0 | 2/2 | Complete | 2026-02-13 |
 | 6. Code Extraction | v2.0 | 0/TBD | Not started | - |
 | 7. UI/UX Documentation | v2.0 | 0/TBD | Not started | - |
 | 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
@@ -187,4 +187,4 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13*
+*Last updated: 2026-02-13 — Phase 5 complete*
