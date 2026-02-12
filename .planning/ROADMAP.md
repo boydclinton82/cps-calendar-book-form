@@ -102,10 +102,12 @@ Plans:
   1. All source files powering the single booking version are extracted with dead code removed
   2. File manifest exists documenting the purpose of each file and function
   3. Key logic sections have technology-neutral annotations explaining WHAT and WHY (not React-specific HOW)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 06-01: TBD (to be planned)
+- [ ] 06-01-PLAN.md — Extract clean source files with dead code removal and dependency graph (CODE-01)
+- [ ] 06-02-PLAN.md — Create FILE-MANIFEST.md documenting all files, functions, and data structures (CODE-02)
+- [ ] 06-03-PLAN.md — Add technology-neutral inline annotations to key logic files (CODE-03)
 
 #### Phase 7: UI/UX Documentation
 **Goal**: Complete interface specification documented from visual captures and code
@@ -178,7 +180,7 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 3. Timezone Display | v1.0 | 3/3 | Complete | 2026-02-04 |
 | 4. Deployment | v1.0 | 1/1 | Complete | 2026-02-04 |
 | 5. Visual Capture | v2.0 | 2/2 | Complete | 2026-02-13 |
-| 6. Code Extraction | v2.0 | 0/TBD | Not started | - |
+| 6. Code Extraction | v2.0 | 0/3 | Planned | - |
 | 7. UI/UX Documentation | v2.0 | 0/TBD | Not started | - |
 | 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
 | 9. Functional Documentation | v2.0 | 0/TBD | Not started | - |
@@ -187,4 +189,4 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13 — Phase 5 complete*
+*Last updated: 2026-02-13 — Phase 6 planned*
