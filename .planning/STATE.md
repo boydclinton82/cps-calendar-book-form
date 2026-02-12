@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 6 complete — ready for Phase 7 (UI/UX Documentation)
+**Current focus:** Phase 7 in progress — UI/UX documentation (layout & design tokens complete)
 
 ## Current Position
 
-Phase: 6 of 10 (Code Extraction)
-Plan: 3 of 3 in current phase
-Status: Phase complete — verified 9/9 must-haves
-Last activity: 2026-02-13 — Phase 6 verified and complete
+Phase: 7 of 10 (UI/UX Documentation)
+Plan: 1 of 6 in current phase
+Status: In progress — foundation docs complete (layout structure + design tokens)
+Last activity: 2026-02-13 — Completed 07-01-PLAN.md
 
-Progress: [██████░░░░] 60% (6 phases complete)
+Progress: [██████▓░░░] 61% (6 phases complete, 7 started)
 
 ## Accumulated Context
 
@@ -40,6 +40,9 @@ Progress: [██████░░░░] 60% (6 phases complete)
 | Standardized annotation tags | Consistent tagging makes code scannable and enables systematic Rails translation | 06-03 | Rails implementation |
 | Inline annotations vs separate docs | Keeps context close to code; annotations live with the logic they explain | 06-03 | Code documentation |
 | Technology Translation Guide | React→Rails mapping helps Rails developer understand React patterns without learning React | 06-03 | Rails implementation |
+| Layout docs before component states | Component state docs need to reference WHERE components exist (layout regions) and WHAT visual values they use (design tokens) | 07-01 | All remaining UI/UX docs |
+| Exhaustive token extraction | Rails needs ALL visual values (not just CSS custom properties) including hardcoded colors from component CSS | 07-01 | Rails implementation |
+| Include both hex and RGB | CSS rgba() needs RGB triplet, but hex is more readable for solid colors; Rails shouldn't convert | 07-01 | Rails implementation |
 
 ### Pending Todos
 
@@ -52,7 +55,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 6 complete — all 3 plans executed, verified 9/9 must-haves
+Stopped at: Completed Phase 7 Plan 01 (LAYOUT-STRUCTURE.md + DESIGN-TOKENS.md)
 Resume file: None
 
 ---
