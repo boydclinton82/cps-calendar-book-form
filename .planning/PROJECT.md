@@ -8,59 +8,71 @@ A multi-instance booking calendar template deployed via Vercel. Each instance al
 
 Users can quickly see availability and book time slots without conflicts.
 
-## Current Milestone: v1.0 Universal Booking Improvements
+## Current Milestone: v2.0 Booking Spec Package
 
-**Goal:** Fix time slot visibility bug and add quality-of-life features (Book Now button, NSW timezone toggle)
+**Goal:** Create an exhaustive, AI-optimized specification package that enables another Claude Code (Opus 4.6) instance to perfectly recreate the single booking form in a Rails application.
 
-**Target features:**
-- Fix current hour visibility bug (slots disappear at hour start instead of hour end)
-- Add "Book Now" button for quick booking of current hour
-- Add NSW timezone toggle to display times in Sydney time
+**Target deliverables:**
+- Visual capture of every state/interaction from the deployed version
+- Clean reference code extracted from this repo (stripped of dead code)
+- Blueprint-level specs: UI, UX, architecture, functionality, edge cases
+- Master SPEC.md written as an AI-consumable prompt/instruction set
+
+**Source of truth:** https://booking-bmo-financial-solutions.vercel.app (deployed single version)
+**Consumer:** Claude Code Opus 4.6 in a separate Rails project
+**Scope:** Single booking form only (no admin, no dual/eureka version)
 
 ## Requirements
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. -->
+<!-- Shipped and confirmed valuable in v1.0 -->
 
-(None yet — ship to validate)
+- ✓ Current hour slot remains visible until the hour ends — v1.0
+- ✓ Users can quickly book the current hour with one click (Book Now) — v1.0
+- ✓ Book Now only appears when current hour is available — v1.0
+- ✓ Book Now reuses existing booking panel workflow — v1.0
+- ✓ Deployed to 4 admin instances — v1.0
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
+<!-- Current scope: v2.0 Spec Package -->
 
-- [ ] Current hour slot remains visible until the hour ends
-- [ ] Users can quickly book the current hour with one click
-- [ ] Users can toggle time display between QLD and NSW timezones
+- [ ] Visual capture of every booking form state from deployed version
+- [ ] Clean reference code extracted and annotated
+- [ ] Blueprint-level UI/UX specification
+- [ ] Architecture and data flow specification
+- [ ] Functional specification with all edge cases
+- [ ] Master SPEC.md as AI-consumable entry point
 
 ### Out of Scope
 
-<!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
+<!-- Explicit boundaries. -->
 
-- Mobile app — Web-first, mobile later
-- Multi-day bookings — Current model is hourly slots only
-- User authentication — Single-user/same-device model works for current use case
-- Admin app changes — This milestone is template-only
+- Admin app spec — Separate milestone later
+- Dual/eureka version — Different architecture, not needed
+- Rails implementation — That's the OTHER project's job
+- Mobile-specific specs — Web-first, current form is desktop-focused
+- Deployment/hosting specs — Rails project has its own infrastructure
 
 ## Context
 
-**Deployment architecture:**
-- Template repo: `boydclinton82/cps-calendar-book-form` (this codebase)
-- 4 instances deployed via admin app (auto-deploy on push)
-- 1 instance (`booking-eureka`) in separate repo requiring manual sync
+**This repo:** React 18 + Vite 6 + Vercel Serverless + Vercel KV
+**Deployed at:** https://booking-bmo-financial-solutions.vercel.app
+**GitHub:** boydclinton82/cps-calendar-book-form (Vercel auto-deploy)
 
-**Current stack:** React 18 + Vite 6 + Vercel Serverless + Vercel KV
+**Why this milestone exists:**
+A separate Rails project needs to recreate this exact booking form. The repo is messy with old/new code mixed together. The spec package provides a clean, unambiguous blueprint that the Rails project's Claude Code can follow without getting lost in repo archaeology.
 
-**Known issues:**
-- `isSlotPast()` in `src/utils/time.js` checks hour START instead of END
-- No quick-book option for common use case (check availability → book now)
-- Time display hardcoded to QLD (UTC+10), NSW users need mental math
+**Key insight:** The spec must be technology-neutral in its behavior descriptions but include React reference code for implementation context. The Rails Claude adapts patterns to its own stack.
 
 ## Constraints
 
-- **Stack**: React + Vite + Vercel (no changes to core stack)
-- **Multi-instance**: All changes must work across all 5 deployments
-- **Backwards compatible**: Existing bookings must continue to work
+- **Blueprint level**: Leave nothing to interpretation — exhaustive detail
+- **AI-optimized**: Written for Claude Code consumption, not human developers
+- **Single version only**: No dual-column/eureka patterns
+- **Technology-neutral behavior**: Describe WHAT and WHY, not React-specific HOW
+- **Reference code included**: Clean code for context, clearly labeled as "adapt, don't port"
 
 ## Key Decisions
 
@@ -68,8 +80,11 @@ Users can quickly see availability and book time slots without conflicts.
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Store times in QLD timezone | Queensland has no DST, simpler storage | — Pending |
-| Display-only timezone toggle | Avoids storage complexity, users convert mentally today | — Pending |
+| Store times in QLD timezone | Queensland has no DST, simpler storage | ✓ Good |
+| Display-only timezone toggle | Avoids storage complexity, users convert mentally today | ✓ Good |
+| Blueprint spec depth | AI consumer won't be overwhelmed; "perfectly" requires exhaustive detail | — Pending |
+| Live + code approach | Screenshots capture visual truth; code reveals logic screenshots can't | — Pending |
+| Technology-neutral behavior specs | Rails is fundamentally different from React; behavior transfers, patterns don't | — Pending |
 
 ---
-*Last updated: 2026-02-04 after milestone v1.0 start*
+*Last updated: 2026-02-13 after milestone v2.0 start*
