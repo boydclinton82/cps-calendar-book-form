@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 8 in progress — Architecture Documentation (plan 02 of 04 complete)
+**Current focus:** Phase 8 in progress — Architecture Documentation (plan 01 of 04 complete)
 
 ## Current Position
 
 Phase: 8 of 10 (Architecture Documentation)
-Plan: 2 of 4 in current phase
-Status: In progress — 2/4 plans complete (ARCH-01, ARCH-02)
-Last activity: 2026-02-13 — Completed 08-02-PLAN.md (API Contracts)
+Plan: 1 of 4 in current phase
+Status: In progress — 1/4 plans complete (ARCH-01 Data Storage, ARCH-05 Instance Config)
+Last activity: 2026-02-13 — Completed 08-01-PLAN.md (Data Storage & Instance Configuration)
 
-Progress: [███████░░░] 70% (7 phases complete + 2/4 current phase plans)
+Progress: [███████░░░] 70% (7 phases complete + 1/4 current phase plans)
 
 ## Accumulated Context
 
@@ -48,11 +48,9 @@ Progress: [███████░░░] 70% (7 phases complete + 2/4 current 
 | Document glass morphism in ANIMATIONS.md | Backdrop-filter blur is critical visual effect but not technically an "animation" | 07-02 | Developers understand glass effect as motion-adjacent |
 | Context-aware keyboard modes | Three mutually exclusive modes prevent shortcut conflicts and make behavior predictable | 07-03 | Rails implementation |
 | Dynamic user hotkeys from config | Configuration-driven hotkeys allow different deployments to customize per their user roster | 07-03 | Rails implementation |
-| Security middleware as cross-cutting concern | All endpoints wrapped with withSecurity() applying headers, CORS, rate limiting uniformly | 08-02 | Rails must replicate exact security behavior |
-| Conflict detection checks only new slots on update | PUT only validates slots beyond current duration when extending; shrinking/user changes skip check | 08-02 | Rails must match two-phase update logic |
-| Fail-open rate limiting | If KV check errors, request allowed rather than rejected to prevent outage | 08-02 | Rails must implement same fault tolerance |
-| Input sanitization before validation | Invalid fields set to null, then validation checks for null rather than rejecting entire request | 08-02 | Rails must match two-phase approach |
-| Date key cleanup on deletion | DELETE removes empty date objects from bookings structure to prevent storage bloat | 08-02 | Rails must implement identical cleanup |
+| Namespace isolation via slug-based key prefixes | Multiple teams can share same KV database with complete data separation | 08-01 | Each instance reads/writes to `instance:{slug}:*` keys only |
+| Read-modify-write pattern for all updates | Full object replacement on every write operation | 08-01 | Simplifies KV usage, acceptable for low-concurrency booking system |
+| Graceful fallback configuration | Hardcoded fallback config when API unavailable | 08-01 | Application must never crash due to missing configuration |
 
 ### Pending Todos
 
@@ -65,7 +63,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 08-02-PLAN.md — API contracts documentation with 5 operations, 27 error examples, conflict detection logic
+Stopped at: Completed 08-01-PLAN.md — Data Storage and Instance Configuration documentation
 Resume file: None
 
 ---
