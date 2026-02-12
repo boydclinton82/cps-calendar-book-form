@@ -1,3 +1,11 @@
+// BEHAVIOR: Core booking management module - tracks all bookings across all dates,
+// provides operations to create/update/delete bookings, and validates booking constraints
+// DATA_FLOW: On initialization -> fetch from server -> cache locally
+//            Every 7 seconds -> poll server for updates -> merge into cache
+//            On mutation (create/update/delete) -> update cache immediately -> send to server -> on failure, re-sync from server
+// DATA_CONSTRAINT: Booking data structure: { "YYYY-MM-DD": { "HH:00": { user: string, duration: number } } }
+//                  Example: { "2026-02-13": { "09:00": { user: "Jack", duration: 2 } } }
+
 import { useState, useCallback, useEffect } from 'react';
 import { isSlotBlocked } from '../utils/time';
 import {
@@ -9,7 +17,7 @@ import {
 } from '../services/api';
 import { usePollingSync } from './usePollingSync';
 
-// Polling interval in milliseconds
+// CONSTANT: POLLING_INTERVAL = 7000ms (7 seconds) - how often to check server for booking changes
 const POLLING_INTERVAL = 7000;
 
 export function useBookings() {
@@ -17,7 +25,8 @@ export function useBookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initial fetch on mount
+  // BEHAVIOR: On initialization, fetch all bookings from server and cache locally
+  // DATA_FLOW: Server -> local cache -> mark as loaded
   useEffect(() => {
     const loadBookings = async () => {
       try {
@@ -36,14 +45,16 @@ export function useBookings() {
     loadBookings();
   }, []);
 
-  // Handle updates from polling
+  // BEHAVIOR: When polling detects changes, replace entire booking cache with server data
+  // WHY: Simple merge strategy - server is source of truth
   const handlePollingUpdate = useCallback((data) => {
     if (data && typeof data === 'object') {
       setBookings(data);
     }
   }, []);
 
-  // Setup polling for real-time sync (only when API is enabled)
+  // BEHAVIOR: Continuously poll server every 7 seconds to detect changes from other users
+  // WHY: Multiple users can book simultaneously; polling keeps everyone's view synchronized
   const { triggerSync } = usePollingSync(
     apiFetchBookings,
     handlePollingUpdate,
@@ -53,12 +64,18 @@ export function useBookings() {
     }
   );
 
+  // BEHAVIOR: Retrieve all bookings for a specific date
+  // DATA_CONSTRAINT: Returns object keyed by timeKey ("HH:00") or empty object if no bookings
   const getBookingsForDate = useCallback((date) => {
     return bookings[date] || {};
   }, [bookings]);
 
+  // BEHAVIOR: Create a new booking - immediately update local cache, then persist to server
+  // DATA_FLOW: Update local cache optimistically -> send to server -> on error, re-sync from server to rollback
+  // VALIDATION: Server will reject if slot already booked or duration conflicts with existing bookings
+  // WHY: Optimistic update provides instant UI feedback; rollback on failure maintains consistency
   const createBooking = useCallback(async (date, time, user, duration) => {
-    // Optimistic update
+    // Optimistic update - assume success and update UI immediately
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (!newBookings[date]) {
@@ -79,20 +96,22 @@ export function useBookings() {
         duration,
       });
     } catch (err) {
-      // Rollback on error
+      // EDGE_CASE: If create fails (conflict, network error), rollback by re-fetching truth from server
       console.error('Failed to create booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
       triggerSync();
     }
   }, [triggerSync]);
 
+  // BEHAVIOR: Delete a booking - immediately remove from local cache, then persist to server
+  // DATA_FLOW: Remove from local cache optimistically -> send delete to server -> on error, re-sync from server
   const removeBooking = useCallback(async (date, time) => {
-    // Optimistic update
+    // Optimistic update - remove immediately
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (newBookings[date] && newBookings[date][time]) {
         delete newBookings[date][time];
+        // Clean up empty date object
         if (Object.keys(newBookings[date]).length === 0) {
           delete newBookings[date];
         }
@@ -106,19 +125,21 @@ export function useBookings() {
         timeKey: time,
       });
     } catch (err) {
-      // Rollback on error
+      // EDGE_CASE: If delete fails, rollback by re-fetching truth from server
       console.error('Failed to delete booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
       triggerSync();
     }
   }, [triggerSync]);
 
+  // BEHAVIOR: Update fields of an existing booking (user or duration)
+  // DATA_FLOW: Merge updates into local cache optimistically -> send to server -> on error, re-sync
+  // VALIDATION: Server validates duration doesn't conflict with other bookings
   const updateBooking = useCallback(async (date, time, updates) => {
     // Store previous value for rollback
     const previousBooking = bookings[date]?.[time];
 
-    // Optimistic update
+    // Optimistic update - apply changes immediately
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (newBookings[date] && newBookings[date][time]) {
@@ -137,20 +158,22 @@ export function useBookings() {
         updates,
       });
     } catch (err) {
-      // Rollback on error
+      // EDGE_CASE: If update fails (conflict, validation error), rollback by re-syncing
       console.error('Failed to update booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
       triggerSync();
     }
   }, [bookings, triggerSync]);
 
-  // Simplified getSlotStatus - only returns status and booking info
-  // Position calculation is now handled by overlay components
+  // BEHAVIOR: Determine the status of a single time slot (available, booked, or blocked)
+  // VALIDATION: 'booked' = slot has a direct booking starting at this time
+  //            'blocked' = slot is in the middle of a multi-hour booking that started earlier
+  //            'available' = slot is free
+  // DATA_CONSTRAINT: Returns { status: string, booking?: object }
   const getSlotStatus = useCallback((dateKey, timeKey, hour) => {
     const dayBookings = bookings[dateKey] || {};
 
-    // Check if this slot has a direct booking
+    // Check if this slot has a direct booking (booking starts at this hour)
     if (dayBookings[timeKey]) {
       const booking = dayBookings[timeKey];
       return {
@@ -159,7 +182,8 @@ export function useBookings() {
       };
     }
 
-    // Check if this slot is blocked by a multi-hour booking
+    // Check if this slot is blocked by a multi-hour booking that started earlier
+    // EDGE_CASE: If someone books 09:00 for 3 hours, slots 10:00 and 11:00 are "blocked"
     const blockInfo = isSlotBlocked(dayBookings, hour);
     if (blockInfo.blocked) {
       return {
@@ -171,20 +195,23 @@ export function useBookings() {
     return { status: 'available' };
   }, [bookings]);
 
+  // BEHAVIOR: Check if a booking can be created at a given slot for a given duration
+  // VALIDATION: Returns false if any slot in the range is already booked or blocked
+  // EDGE_CASE: For a 3-hour booking starting at 09:00, checks 09:00, 10:00, 11:00 for conflicts
   const canBook = useCallback((date, timeKey, hour, duration) => {
     const dayBookings = bookings[date] || {};
 
-    // Check all slots that would be occupied
+    // Check all slots that would be occupied by this booking
     for (let i = 0; i < duration; i++) {
       const checkHour = hour + i;
       const checkKey = `${checkHour.toString().padStart(2, '0')}:00`;
 
-      // Check if slot is already booked
+      // Check if slot is already booked (has a booking starting at this hour)
       if (dayBookings[checkKey]) {
         return false;
       }
 
-      // Check if slot is blocked by another booking
+      // Check if slot is blocked by another booking (is in the middle of a multi-hour booking)
       const blockInfo = isSlotBlocked(dayBookings, checkHour);
       if (blockInfo.blocked) {
         return false;
@@ -194,8 +221,10 @@ export function useBookings() {
     return true;
   }, [bookings]);
 
-  // Check if duration can be changed for an existing booking
-  // Excludes the current booking's slots from conflict check
+  // BEHAVIOR: Check if an existing booking's duration can be changed to a new duration
+  // VALIDATION: Only checks slots beyond the current duration (already-occupied slots are allowed)
+  // EDGE_CASE: If booking is 09:00 for 2 hours (occupies 09:00, 10:00), changing to 3 hours only checks 11:00 for conflicts
+  // WHY: User is extending/shrinking their existing booking; only new slots need validation
   const canChangeDuration = useCallback((date, timeKey, hour, currentDuration, newDuration) => {
     const dayBookings = bookings[date] || {};
 
@@ -204,7 +233,7 @@ export function useBookings() {
       const checkHour = hour + i;
       const checkKey = `${checkHour.toString().padStart(2, '0')}:00`;
 
-      // Skip slots that are part of current booking
+      // Skip slots that are part of current booking (these are already occupied by this booking)
       if (i < currentDuration) {
         continue;
       }
@@ -215,6 +244,7 @@ export function useBookings() {
       }
 
       // Check if slot is blocked by another booking (not by current booking)
+      // EDGE_CASE: Must exclude blocks caused by the current booking itself
       const blockInfo = isSlotBlocked(dayBookings, checkHour);
       if (blockInfo.blocked && blockInfo.startKey !== timeKey) {
         return false;

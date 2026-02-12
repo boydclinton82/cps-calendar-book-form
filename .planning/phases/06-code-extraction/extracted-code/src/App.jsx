@@ -1,3 +1,12 @@
+// BEHAVIOR: Main application orchestrator - manages global state, coordinates user interactions,
+// and delegates to specialized modules (bookings, keyboard, config)
+// DATA_FLOW: Config loaded -> bookings loaded -> user interacts -> state updates -> UI refreshes
+// VALIDATION: Multiple interaction modes with strict state transitions:
+//            - NAVIGATION MODE: No selection, can browse dates, select slots
+//            - PANEL MODE: Slot selected, user picks person and duration
+//            - POPUP MODE: Booking selected for editing
+// EDGE_CASE: Only one mode active at a time; opening panel/popup disables other interactions
+
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { TimeStrip } from './components/TimeStrip';
@@ -15,20 +24,24 @@ import './App.css';
 const TIME_SLOTS = generateTimeSlots();
 
 function App() {
-  // Get config from context
+  // DATA_FLOW: On initialization, fetch instance config (title, user list) from server
   const { loading, error, title, users } = useConfig();
 
+  // BEHAVIOR: Track current view state - which date, which view mode, what's selected
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isWeekView, setIsWeekView] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [focusedSlotIndex, setFocusedSlotIndex] = useState(null);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [useNSWTime, setUseNSWTime] = useState(() => getTimezonePreference());
+  const [selectedSlot, setSelectedSlot] = useState(null);  // PANEL MODE: Which slot user is booking
+  const [selectedUser, setSelectedUser] = useState(null);  // PANEL MODE: Who the booking is for
+  const [focusedSlotIndex, setFocusedSlotIndex] = useState(null);  // Keyboard navigation focus
+  const [selectedBooking, setSelectedBooking] = useState(null);  // POPUP MODE: Which booking is being edited
+  const [useNSWTime, setUseNSWTime] = useState(() => getTimezonePreference());  // Timezone display toggle
 
+  // DATA_FLOW: Connect to booking management module for all booking operations
   const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration } = useBookings();
 
-  // Compute visible slots and available slot indices for keyboard navigation
+  // BEHAVIOR: Calculate which time slots should be visible on current date
+  // EDGE_CASE: For today, hide past slots; for future dates, show all slots
+  // WHY: Users shouldn't see slots they can't book
   const dateKey = formatDate(currentDate);
   const { visibleSlots, availableIndices } = useMemo(() => {
     const visible = isToday(currentDate)
@@ -45,15 +58,19 @@ function App() {
     return { visibleSlots: visible, availableIndices: indices };
   }, [currentDate, dateKey, getSlotStatus]);
 
-  // Auto-refresh on the hour to update past slots
+  // BEHAVIOR: Automatically refresh UI every hour to update which slots are past
+  // WHY: At 10:00 AM, the 9:00 AM slot should disappear from today's view
   useHourlyRefresh();
 
-  // Persist timezone preference to localStorage
+  // BEHAVIOR: Save timezone preference whenever user toggles it
+  // DATA_FLOW: User presses [T] key -> useNSWTime changes -> save to localStorage
   useEffect(() => {
     saveTimezonePreference(useNSWTime);
   }, [useNSWTime]);
 
-  // Compute if current hour is available for "Book Now" button
+  // BEHAVIOR: Determine if "Book Now" button should be visible
+  // VALIDATION: Current hour must be within booking hours, not past, and available
+  // EDGE_CASE: At 9:45 AM, 9:00 AM slot is still bookable, so "Book Now" appears
   const currentHourAvailable = useMemo(() => {
     const now = new Date();
     const currentHour = now.getHours();
@@ -76,38 +93,46 @@ function App() {
     return status.status === 'available';
   }, [getSlotStatus, bookings]);
 
-  // Navigation - 7 days for week view, 1 day for day view
+  // BEHAVIOR: Navigate forward/backward in time
+  // EDGE_CASE: In week view, moves by 7 days (to next/previous week)
+  //           In day view, moves by 1 day
+  // WHY: Arrow keys move by different amounts depending on view mode
   const handleNavigate = useCallback((direction) => {
     const daysToMove = isWeekView ? 7 : 1;
     setCurrentDate((prev) => addDays(prev, direction * daysToMove));
-    setFocusedSlotIndex(null); // Reset focus on date change
+    setFocusedSlotIndex(null); // Reset keyboard focus on date change
   }, [isWeekView]);
 
-  // Toggle week view
+  // BEHAVIOR: Switch between day view (single day, full details) and week view (7 days, compact)
+  // VALIDATION: Clears any active selection when toggling views
   const handleWeekToggle = useCallback(() => {
     setIsWeekView((prev) => !prev);
     setSelectedSlot(null);
     setSelectedUser(null);
   }, []);
 
-  // Toggle timezone display
+  // BEHAVIOR: Toggle between Queensland time and NSW time display
+  // WHY: NSW users can see times in their local timezone during daylight saving
   const handleTimezoneToggle = useCallback(() => {
     setUseNSWTime(prev => !prev);
   }, []);
 
-  // Select day from week view
+  // BEHAVIOR: When user clicks a day in week view, switch to day view for that date
+  // DATA_FLOW: Week view -> click day -> switch to day view -> show that day's slots
   const handleDaySelect = useCallback((date) => {
     setCurrentDate(date);
     setIsWeekView(false);
   }, []);
 
-  // Slot selection
+  // BEHAVIOR: User clicks/selects a time slot - opens booking panel for that slot
+  // DATA_FLOW: Slot selected -> panel opens -> user picks person and duration -> booking created
   const handleSlotSelect = useCallback((slot) => {
     setSelectedSlot(slot);
     setSelectedUser(null);
   }, []);
 
-  // Handle "Book Now" button - books current hour
+  // BEHAVIOR: "Book Now" button - instantly opens panel for current hour
+  // WHY: Fastest path to book current time - single click instead of finding current slot
   const handleBookNow = useCallback(() => {
     const now = new Date();
     const currentHour = now.getHours();
@@ -120,22 +145,27 @@ function App() {
     handleSlotSelect(slot);
   }, [handleSlotSelect]);
 
-  // Cancel booking panel
+  // BEHAVIOR: Close booking panel without creating booking
+  // DATA_FLOW: Panel open -> user presses Escape -> panel closes -> no booking created
   const handleCancelPanel = useCallback(() => {
     setSelectedSlot(null);
     setSelectedUser(null);
   }, []);
 
-  // User selection
+  // BEHAVIOR: User selects who the booking is for
+  // DATA_FLOW: Panel open -> user presses [J] for Jack -> selectedUser = "Jack" -> awaiting duration
   const handleUserSelect = useCallback((user) => {
     setSelectedUser(user);
   }, []);
 
-  // Duration selection and booking creation
+  // BEHAVIOR: User selects duration - completes booking creation
+  // DATA_FLOW: Slot + user selected -> user presses [2] -> validate availability -> create booking -> close panel
+  // VALIDATION: Only creates booking if all slots in duration range are available
+  // EDGE_CASE: If validation fails (conflict detected), silently ignores - no booking created, panel stays open
   const handleDurationSelect = useCallback((duration) => {
     if (!selectedSlot || !selectedUser) return;
 
-    // Check if booking is possible
+    // Validate that booking is possible for this duration
     if (!canBook(selectedSlot.dateKey, selectedSlot.key, selectedSlot.hour, duration)) {
       return;
     }
@@ -143,17 +173,19 @@ function App() {
     // Create the booking
     createBooking(selectedSlot.dateKey, selectedSlot.key, selectedUser, duration);
 
-    // Reset selection
+    // Close panel - booking created successfully
     setSelectedSlot(null);
     setSelectedUser(null);
   }, [selectedSlot, selectedUser, canBook, createBooking]);
 
-  // Cancel a booking
+  // BEHAVIOR: Delete an existing booking (from day view)
+  // DATA_FLOW: User clicks X button on booking -> booking removed from server and local cache -> UI updates
   const handleSlotCancel = useCallback((dateKey, timeKey) => {
     removeBooking(dateKey, timeKey);
   }, [removeBooking]);
 
-  // Open booking popup for editing
+  // BEHAVIOR: User clicks on existing booking - opens popup to edit it
+  // DATA_FLOW: Click booking -> open popup with current values -> can change user, duration, or delete
   const handleBookingClick = useCallback((dateKey, timeKey, booking) => {
     const hour = parseInt(timeKey.split(':')[0], 10);
     setSelectedBooking({
@@ -165,36 +197,43 @@ function App() {
     });
   }, []);
 
-  // Close booking popup
+  // BEHAVIOR: Close edit popup - saves any changes that were made
+  // WHY: Changes are applied immediately via optimistic updates; closing just dismisses UI
   const handlePopupClose = useCallback(() => {
     setSelectedBooking(null);
   }, []);
 
-  // Change user in booking popup
+  // BEHAVIOR: Change who a booking is assigned to
+  // DATA_FLOW: User presses [J] in popup -> update booking on server -> update local cache -> update popup display
   const handlePopupUserChange = useCallback((user) => {
     if (!selectedBooking) return;
     updateBooking(selectedBooking.dateKey, selectedBooking.timeKey, { user });
     setSelectedBooking((prev) => ({ ...prev, user }));
   }, [selectedBooking, updateBooking]);
 
-  // Change duration in booking popup
+  // BEHAVIOR: Change duration of existing booking
+  // VALIDATION: Only works if new duration doesn't conflict with other bookings
+  // DATA_FLOW: User presses [3] in popup -> validate -> update booking -> update display
   const handlePopupDurationChange = useCallback((duration) => {
     if (!selectedBooking) return;
     updateBooking(selectedBooking.dateKey, selectedBooking.timeKey, { duration });
     setSelectedBooking((prev) => ({ ...prev, duration }));
   }, [selectedBooking, updateBooking]);
 
-  // Delete booking from popup
+  // BEHAVIOR: Delete booking from edit popup
+  // DATA_FLOW: User presses [D] in popup -> delete from server -> remove from cache -> close popup
   const handlePopupDelete = useCallback(() => {
     if (!selectedBooking) return;
     removeBooking(selectedBooking.dateKey, selectedBooking.timeKey);
     setSelectedBooking(null);
   }, [selectedBooking, removeBooking]);
 
-  // Check if duration can be changed in popup
+  // BEHAVIOR: Validate if duration can be changed for booking being edited
+  // VALIDATION: Duration must not exceed END_HOUR and must not conflict with other bookings
+  // EDGE_CASE: If booking is at 21:00 (9 PM) and user tries 3-hour duration, would go to 24:00 - rejected
   const canPopupChangeDuration = useCallback((newDuration) => {
     if (!selectedBooking) return false;
-    // Check if duration would exceed time range
+    // Check if duration would exceed time range (latest slot is 21:00, so max 1-hour booking there)
     if (selectedBooking.hour + newDuration > END_HOUR) {
       return false;
     }
@@ -207,7 +246,9 @@ function App() {
     );
   }, [selectedBooking, canChangeDuration]);
 
-  // Check if a duration can be booked for current selection
+  // BEHAVIOR: Validate if a duration option should be enabled in booking panel
+  // VALIDATION: Duration must not exceed END_HOUR and all slots must be available
+  // EDGE_CASE: If selecting 21:00 slot, only 1-hour duration allowed (2 or 3 hours disabled)
   const canBookDuration = useCallback((duration) => {
     if (!selectedSlot) return false;
 
@@ -219,7 +260,10 @@ function App() {
     return canBook(selectedSlot.dateKey, selectedSlot.key, selectedSlot.hour, duration);
   }, [selectedSlot, canBook]);
 
-  // Focus navigation: move to previous available slot (wrap at boundary)
+  // BEHAVIOR: Keyboard navigation - move focus up to previous available slot
+  // EDGE_CASE: Skips booked/blocked slots - only focuses available slots
+  // EDGE_CASE: Wraps around - pressing up at first available slot jumps to last available slot
+  // WHY: Provides keyboard-only navigation path for accessibility
   const handleSlotFocusUp = useCallback(() => {
     if (availableIndices.length === 0) return;
 
@@ -238,7 +282,9 @@ function App() {
     });
   }, [availableIndices]);
 
-  // Focus navigation: move to next available slot (wrap at boundary)
+  // BEHAVIOR: Keyboard navigation - move focus down to next available slot
+  // EDGE_CASE: Skips booked/blocked slots - only focuses available slots
+  // EDGE_CASE: Wraps around - pressing down at last available slot jumps to first available slot
   const handleSlotFocusDown = useCallback(() => {
     if (availableIndices.length === 0) return;
 
@@ -257,7 +303,8 @@ function App() {
     });
   }, [availableIndices]);
 
-  // Select the currently focused slot
+  // BEHAVIOR: Confirm selection of focused slot (via Enter key)
+  // DATA_FLOW: User presses Up/Down arrows to focus slot -> presses Enter -> opens booking panel for that slot
   const handleFocusedSlotSelect = useCallback(() => {
     if (focusedSlotIndex === null || focusedSlotIndex >= visibleSlots.length) return;
 
@@ -266,9 +313,15 @@ function App() {
     setFocusedSlotIndex(null);
   }, [focusedSlotIndex, visibleSlots, dateKey, handleSlotSelect]);
 
-  // Keyboard shortcuts - pass users from config
+  // BEHAVIOR: Wire up keyboard shortcuts with context-aware activation
+  // VALIDATION: Shortcuts are only enabled when appropriate for current mode:
+  //            - Popup mode: Only popup shortcuts active
+  //            - Panel mode: Only panel and some navigation shortcuts active
+  //            - Navigation mode: Full navigation shortcuts active
+  // EDGE_CASE: When popup is open, all navigation is disabled - user must close popup first
+  // WHY: Prevents conflicting keyboard interactions (e.g., pressing W shouldn't toggle week view while editing booking)
   useKeyboard({
-    users,  // Pass users from config
+    users,  // Pass users from config for dynamic user key bindings
     // Popup mode (edit existing booking)
     onPopupUserSelect: selectedBooking ? handlePopupUserChange : undefined,
     onPopupDurationSelect: selectedBooking ? handlePopupDurationChange : undefined,
@@ -279,7 +332,7 @@ function App() {
     onUserSelect: !selectedBooking && selectedSlot ? handleUserSelect : undefined,
     onDurationSelect: !selectedBooking && selectedSlot && selectedUser ? handleDurationSelect : undefined,
     onCancel: !selectedBooking && selectedSlot ? handleCancelPanel : undefined,
-    // General navigation
+    // General navigation (disabled when popup open)
     onWeekToggle: !selectedBooking ? handleWeekToggle : undefined,
     onBookNow: !selectedBooking && currentHourAvailable ? handleBookNow : undefined,
     onTimezoneToggle: !selectedBooking ? handleTimezoneToggle : undefined,
@@ -288,11 +341,12 @@ function App() {
     onSlotFocusDown: !isWeekView && !selectedSlot && !selectedBooking ? handleSlotFocusDown : undefined,
     onSlotSelect: !isWeekView && !selectedSlot && !selectedBooking && focusedSlotIndex !== null ? handleFocusedSlotSelect : undefined,
     isWeekView,
-    enabled: !loading,  // Disable keyboard when loading
+    enabled: !loading,  // Disable all keyboard shortcuts while config is loading
   });
 
-  // Determine current user for highlighting own bookings
-  // For prototype: always assume first user is logged in
+  // BEHAVIOR: Determine "current user" for highlighting own bookings in UI
+  // EDGE_CASE: In prototype, always assumes first user in config is the logged-in user
+  // WHY: Real system would have authentication; prototype hardcodes for simplicity
   const currentUser = users.length > 0 ? users[0].name : 'User';
 
   // Show loading state
