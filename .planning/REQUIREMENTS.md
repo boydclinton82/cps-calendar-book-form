@@ -20,12 +20,12 @@ Requirements for milestone v2.0: Booking Spec Package.
 
 ### UI/UX Specification
 
-- [ ] **UIUX-01**: Document complete layout structure (header, calendar, time grid, booking panel, overlays)
-- [ ] **UIUX-02**: Document color palette, typography, and spacing values extracted from live site
-- [ ] **UIUX-03**: Document every interactive element with behavior on hover, click, active, and disabled states
-- [ ] **UIUX-04**: Document all animations and transitions (Book Now pulse, slot highlighting, panel transitions)
-- [ ] **UIUX-05**: Document all keyboard shortcuts and their conditional behavior (B, T, hotkey names)
-- [ ] **UIUX-06**: Document responsive breakpoints and mobile layout adaptations
+- [x] **UIUX-01**: Document complete layout structure (header, calendar, time grid, booking panel, overlays)
+- [x] **UIUX-02**: Document color palette, typography, and spacing values extracted from live site
+- [x] **UIUX-03**: Document every interactive element with behavior on hover, click, active, and disabled states
+- [x] **UIUX-04**: Document all animations and transitions (Book Now pulse, slot highlighting, panel transitions)
+- [x] **UIUX-05**: Document all keyboard shortcuts and their conditional behavior (B, T, hotkey names)
+- [x] **UIUX-06**: Document responsive breakpoints and mobile layout adaptations
 
 ### Architecture & Data
 
@@ -86,12 +86,12 @@ Deferred to later milestones.
 | VCAP-06 | Phase 5 | Complete |
 | VCAP-07 | Phase 5 | Complete |
 | VCAP-08 | Phase 5 | Complete |
-| UIUX-01 | Phase 7 | Pending |
-| UIUX-02 | Phase 7 | Pending |
-| UIUX-03 | Phase 7 | Pending |
-| UIUX-04 | Phase 7 | Pending |
-| UIUX-05 | Phase 7 | Pending |
-| UIUX-06 | Phase 7 | Pending |
+| UIUX-01 | Phase 7 | Complete |
+| UIUX-02 | Phase 7 | Complete |
+| UIUX-03 | Phase 7 | Complete |
+| UIUX-04 | Phase 7 | Complete |
+| UIUX-05 | Phase 7 | Complete |
+| UIUX-06 | Phase 7 | Complete |
 | ARCH-01 | Phase 8 | Pending |
 | ARCH-02 | Phase 8 | Pending |
 | ARCH-03 | Phase 8 | Pending |
@@ -116,4 +116,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-02-13*
-*Traceability updated: 2026-02-13 after roadmap creation*
+*Traceability updated: 2026-02-13 — Phase 7 UIUX requirements complete*
