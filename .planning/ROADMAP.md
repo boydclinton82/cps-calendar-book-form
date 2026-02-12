@@ -1,21 +1,14 @@
 # Roadmap: CPS Calendar Book Form
 
-## Overview
+## Milestones
 
-This milestone delivers three improvements to the booking calendar: fixing the premature slot disappearance bug, adding a quick "Book Now" button for the current hour, and adding an NSW timezone toggle for Sydney users. Changes deploy automatically to admin instances and manually to the eureka instance.
+- ✅ **v1.0 Universal Booking Improvements** - Phases 1-4 (shipped 2026-02-04)
+- 🚧 **v2.0 Booking Spec Package** - Phases 5-10 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3, 4): Planned milestone work
-- Decimal phases (e.g., 2.1): Urgent insertions (marked with INSERTED)
-
-- [x] **Phase 1: Time Slot Fix** - Fix current hour visibility bug ✓
-- [x] **Phase 2: Quick Booking** - Add "Book Now" button for current hour ✓
-- [x] **Phase 3: Timezone Display** - Add NSW timezone toggle ✓
-- [x] **Phase 4: Deployment** - Deploy to admin instances ✓ (eureka separate)
-
-## Phase Details
+<details>
+<summary>✅ v1.0 Universal Booking Improvements (Phases 1-4) - SHIPPED 2026-02-04</summary>
 
 ### Phase 1: Time Slot Fix
 **Goal**: Current hour slot remains bookable until the hour fully elapses
@@ -76,18 +69,121 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md - Push template repo to admin instances ✓ (eureka excluded - separate architecture)
 
+</details>
+
+### 🚧 v2.0 Booking Spec Package (In Progress)
+
+**Milestone Goal:** Create an exhaustive specification package enabling Claude Code to perfectly recreate the booking form in Rails.
+
+#### Phase 5: Visual Capture
+**Goal**: Every visual state and interaction captured from the deployed booking form
+**Depends on**: Nothing (starts v2.0)
+**Requirements**: VCAP-01, VCAP-02, VCAP-03, VCAP-04, VCAP-05, VCAP-06, VCAP-07, VCAP-08
+**Success Criteria** (what must be TRUE):
+  1. Screenshot exists showing initial empty calendar state with no date selected
+  2. Screenshot exists showing calendar with selected date and complete time slot grid
+  3. Screenshots exist for all slot states (available, booked, past, current hour, multi-hour blocked)
+  4. Screenshots exist documenting the complete booking flow from panel open to confirmation
+  5. Screenshots exist showing Book Now button visibility conditions and hidden states
+  6. Screenshots exist showing both QLD and NSW timezone display modes with offset indicator
+  7. Screenshots exist showing responsive layout at mobile/tablet breakpoints
+  8. All screenshots are annotated with labels identifying interactive elements and state descriptions
+**Plans**: TBD
+
+Plans:
+- [ ] 05-01: TBD (to be planned)
+
+#### Phase 6: Code Extraction
+**Goal**: Clean reference code extracted from React implementation and documented
+**Depends on**: Nothing (can run parallel with Phase 5)
+**Requirements**: CODE-01, CODE-02, CODE-03
+**Success Criteria** (what must be TRUE):
+  1. All source files powering the single booking version are extracted with dead code removed
+  2. File manifest exists documenting the purpose of each file and function
+  3. Key logic sections have technology-neutral annotations explaining WHAT and WHY (not React-specific HOW)
+**Plans**: TBD
+
+Plans:
+- [ ] 06-01: TBD (to be planned)
+
+#### Phase 7: UI/UX Documentation
+**Goal**: Complete interface specification documented from visual captures and code
+**Depends on**: Phase 5 (visual captures) and Phase 6 (code extraction)
+**Requirements**: UIUX-01, UIUX-02, UIUX-03, UIUX-04, UIUX-05, UIUX-06
+**Success Criteria** (what must be TRUE):
+  1. Complete layout structure documented (header, calendar, time grid, booking panel, all overlays)
+  2. Color palette, typography, and spacing values extracted and documented from live site
+  3. Every interactive element documented with all state behaviors (hover, click, active, disabled)
+  4. All animations and transitions documented (Book Now pulse, slot highlighting, panel slide)
+  5. All keyboard shortcuts documented with their conditional behavior rules
+  6. Responsive breakpoints documented with mobile/tablet layout adaptations
+**Plans**: TBD
+
+Plans:
+- [ ] 07-01: TBD (to be planned)
+
+#### Phase 8: Architecture Documentation
+**Goal**: System internals and data flows documented for Rails reimplementation
+**Depends on**: Phase 6 (code extraction)
+**Requirements**: ARCH-01, ARCH-02, ARCH-03, ARCH-04, ARCH-05
+**Success Criteria** (what must be TRUE):
+  1. Data storage schema documented (Vercel KV key structure, booking data format, field types)
+  2. All API endpoints documented with request/response formats and error handling patterns
+  3. Polling mechanism documented (interval timing, what triggers polls, conflict detection logic)
+  4. Application state documented (what state exists, how it flows, what triggers updates)
+  5. Instance configuration documented (environment variables, per-instance settings, differences between instances)
+**Plans**: TBD
+
+Plans:
+- [ ] 08-01: TBD (to be planned)
+
+#### Phase 9: Functional Documentation
+**Goal**: All behaviors and edge cases documented as technology-neutral specifications
+**Depends on**: Phase 5 (visual captures), Phase 6 (code extraction), and Phase 8 (architecture)
+**Requirements**: FUNC-01, FUNC-02, FUNC-03, FUNC-04, FUNC-05
+**Success Criteria** (what must be TRUE):
+  1. Complete booking flow documented step-by-step with all decision points and branching logic
+  2. Book Now feature fully specified with all visibility conditions and interaction behaviors
+  3. Timezone toggle fully specified with DST detection logic and display conversion rules
+  4. All edge cases documented (booking conflicts, past hours, multi-hour bookings, midnight boundary, week transitions)
+  5. Time/date handling fully specified (QLD storage, slot calculation, current hour logic, week navigation)
+**Plans**: TBD
+
+Plans:
+- [ ] 09-01: TBD (to be planned)
+
+#### Phase 10: Master Spec Assembly
+**Goal**: AI-consumable specification package complete and ready for Rails Claude
+**Depends on**: Phase 7 (UI/UX docs), Phase 8 (architecture docs), and Phase 9 (functional docs)
+**Requirements**: SPEC-01, SPEC-02, SPEC-03
+**Success Criteria** (what must be TRUE):
+  1. SPEC.md exists as the entry point with build instructions for Rails Claude Code
+  2. Package directory structure documented with "how to use this spec" guide
+  3. Technology-neutral system summary exists covering all features and behaviors
+**Plans**: TBD
+
+Plans:
+- [ ] 10-01: TBD (to be planned)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
+Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9 → 10
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Time Slot Fix | 1/1 | ✓ Complete | 2026-02-04 |
-| 2. Quick Booking | 1/1 | ✓ Complete | 2026-02-04 |
-| 3. Timezone Display | 3/3 | ✓ Complete | 2026-02-04 |
-| 4. Deployment | 1/1 | ✓ Complete | 2026-02-04 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Time Slot Fix | v1.0 | 1/1 | Complete | 2026-02-04 |
+| 2. Quick Booking | v1.0 | 1/1 | Complete | 2026-02-04 |
+| 3. Timezone Display | v1.0 | 3/3 | Complete | 2026-02-04 |
+| 4. Deployment | v1.0 | 1/1 | Complete | 2026-02-04 |
+| 5. Visual Capture | v2.0 | 0/TBD | Not started | - |
+| 6. Code Extraction | v2.0 | 0/TBD | Not started | - |
+| 7. UI/UX Documentation | v2.0 | 0/TBD | Not started | - |
+| 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
+| 9. Functional Documentation | v2.0 | 0/TBD | Not started | - |
+| 10. Master Spec Assembly | v2.0 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Milestone: v1.0 Universal Booking Improvements*
+*v2.0 milestone added: 2026-02-13*
+*Last updated: 2026-02-13*

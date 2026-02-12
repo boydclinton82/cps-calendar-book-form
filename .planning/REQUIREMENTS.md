@@ -78,42 +78,42 @@ Deferred to later milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VCAP-01 | — | Pending |
-| VCAP-02 | — | Pending |
-| VCAP-03 | — | Pending |
-| VCAP-04 | — | Pending |
-| VCAP-05 | — | Pending |
-| VCAP-06 | — | Pending |
-| VCAP-07 | — | Pending |
-| VCAP-08 | — | Pending |
-| UIUX-01 | — | Pending |
-| UIUX-02 | — | Pending |
-| UIUX-03 | — | Pending |
-| UIUX-04 | — | Pending |
-| UIUX-05 | — | Pending |
-| UIUX-06 | — | Pending |
-| ARCH-01 | — | Pending |
-| ARCH-02 | — | Pending |
-| ARCH-03 | — | Pending |
-| ARCH-04 | — | Pending |
-| ARCH-05 | — | Pending |
-| FUNC-01 | — | Pending |
-| FUNC-02 | — | Pending |
-| FUNC-03 | — | Pending |
-| FUNC-04 | — | Pending |
-| FUNC-05 | — | Pending |
-| CODE-01 | — | Pending |
-| CODE-02 | — | Pending |
-| CODE-03 | — | Pending |
-| SPEC-01 | — | Pending |
-| SPEC-02 | — | Pending |
-| SPEC-03 | — | Pending |
+| VCAP-01 | Phase 5 | Pending |
+| VCAP-02 | Phase 5 | Pending |
+| VCAP-03 | Phase 5 | Pending |
+| VCAP-04 | Phase 5 | Pending |
+| VCAP-05 | Phase 5 | Pending |
+| VCAP-06 | Phase 5 | Pending |
+| VCAP-07 | Phase 5 | Pending |
+| VCAP-08 | Phase 5 | Pending |
+| UIUX-01 | Phase 7 | Pending |
+| UIUX-02 | Phase 7 | Pending |
+| UIUX-03 | Phase 7 | Pending |
+| UIUX-04 | Phase 7 | Pending |
+| UIUX-05 | Phase 7 | Pending |
+| UIUX-06 | Phase 7 | Pending |
+| ARCH-01 | Phase 8 | Pending |
+| ARCH-02 | Phase 8 | Pending |
+| ARCH-03 | Phase 8 | Pending |
+| ARCH-04 | Phase 8 | Pending |
+| ARCH-05 | Phase 8 | Pending |
+| FUNC-01 | Phase 9 | Pending |
+| FUNC-02 | Phase 9 | Pending |
+| FUNC-03 | Phase 9 | Pending |
+| FUNC-04 | Phase 9 | Pending |
+| FUNC-05 | Phase 9 | Pending |
+| CODE-01 | Phase 6 | Pending |
+| CODE-02 | Phase 6 | Pending |
+| CODE-03 | Phase 6 | Pending |
+| SPEC-01 | Phase 10 | Pending |
+| SPEC-02 | Phase 10 | Pending |
+| SPEC-03 | Phase 10 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️
+- Mapped to phases: 30
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after initial definition*
+*Traceability updated: 2026-02-13 after roadmap creation*
