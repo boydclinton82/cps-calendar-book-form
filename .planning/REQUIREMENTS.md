@@ -1,82 +1,119 @@
 # Requirements: CPS Calendar Book Form
 
-**Defined:** 2026-02-04
-**Core Value:** Users can quickly see availability and book time slots without conflicts
+**Defined:** 2026-02-13
+**Core Value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
 
-## v1 Requirements
+## v2.0 Requirements
 
-Requirements for milestone v1.0: Universal Booking Improvements.
+Requirements for milestone v2.0: Booking Spec Package.
 
-### Time Slots
+### Visual Capture
 
-- [x] **SLOT-01**: Current hour slot remains visible and bookable until the hour fully elapses (e.g., 9:00 slot visible until 9:59:59) ✓
+- [ ] **VCAP-01**: Screenshot of initial load state (empty calendar, no date selected)
+- [ ] **VCAP-02**: Screenshot of calendar with date selected showing time slot grid
+- [ ] **VCAP-03**: Screenshots of all slot visual states (available, booked, past, current hour, blocked by multi-hour)
+- [ ] **VCAP-04**: Screenshots of complete booking flow (panel open → name selection → duration → confirmation)
+- [ ] **VCAP-05**: Screenshots of Book Now button (visible state and hidden state with reasons)
+- [ ] **VCAP-06**: Screenshots of timezone toggle (QLD default and NSW active with offset indicator)
+- [ ] **VCAP-07**: Screenshots of mobile/responsive view at key breakpoints
+- [ ] **VCAP-08**: All screenshots annotated with interactive elements and state descriptions
 
-### Quick Booking
+### UI/UX Specification
 
-- [x] **BOOK-01**: User can click "Book Now" button to open booking panel for the current hour ✓
-- [x] **BOOK-02**: "Book Now" button only appears when current hour is available (not booked, not past, not blocked by multi-hour booking) ✓
-- [x] **BOOK-03**: "Book Now" reuses existing booking panel workflow (user selects name via hotkey, then duration) ✓
+- [ ] **UIUX-01**: Document complete layout structure (header, calendar, time grid, booking panel, overlays)
+- [ ] **UIUX-02**: Document color palette, typography, and spacing values extracted from live site
+- [ ] **UIUX-03**: Document every interactive element with behavior on hover, click, active, and disabled states
+- [ ] **UIUX-04**: Document all animations and transitions (Book Now pulse, slot highlighting, panel transitions)
+- [ ] **UIUX-05**: Document all keyboard shortcuts and their conditional behavior (B, T, hotkey names)
+- [ ] **UIUX-06**: Document responsive breakpoints and mobile layout adaptations
 
-### Timezone Display
+### Architecture & Data
 
-- [ ] **TIME-01**: User can toggle time display between QLD (UTC+10) and NSW timezone (AEDT/AEST)
-- [ ] **TIME-02**: Toggle shows visual indicator of current offset (e.g., "+1 hour" during daylight savings)
-- [ ] **TIME-03**: Timezone toggle affects display only — bookings stored in QLD time
-- [ ] **TIME-04**: Toggle state persists in localStorage so user doesn't have to re-enable each visit
+- [ ] **ARCH-01**: Document data storage schema (Vercel KV key structure, booking data format)
+- [ ] **ARCH-02**: Document all API endpoints with request/response formats and error handling
+- [ ] **ARCH-03**: Document polling mechanism (interval, triggers, conflict detection)
+- [ ] **ARCH-04**: Document application state management (what state exists, how it flows between components)
+- [ ] **ARCH-05**: Document instance configuration (environment variables, per-instance settings, how instances differ)
 
-### Deployment
+### Functional Specification
 
-- [ ] **DEPL-01**: Changes committed and pushed to template repo trigger auto-deploy to 4 admin instances
-- [ ] **DEPL-02**: Changed files manually synced to booking-eureka repo and pushed
+- [ ] **FUNC-01**: Document complete booking flow step-by-step with all decision points
+- [ ] **FUNC-02**: Document Book Now feature with all visibility conditions and interaction flow
+- [ ] **FUNC-03**: Document timezone toggle with DST detection logic and display conversion rules
+- [ ] **FUNC-04**: Document all edge cases (booking conflicts, past hours, multi-hour bookings, midnight boundary, week transitions)
+- [ ] **FUNC-05**: Document time/date handling (QLD timezone storage, slot calculation, current hour logic, week navigation)
+
+### Reference Code
+
+- [ ] **CODE-01**: Extract all source files powering the current single version, stripped of dead code
+- [ ] **CODE-02**: Create file manifest documenting what each file/function does
+- [ ] **CODE-03**: Annotate key logic sections with technology-neutral explanations
+
+### Master Specification
+
+- [ ] **SPEC-01**: Write SPEC.md as AI-consumable entry point with build instructions
+- [ ] **SPEC-02**: Include package directory structure and "how to use this spec" guide
+- [ ] **SPEC-03**: Include technology-neutral system summary covering all features and behaviors
 
 ## Future Requirements
 
-Deferred to later milestones. Not in current roadmap.
+Deferred to later milestones.
 
-### Notifications
+### Admin Spec Package
 
-- **NOTF-01**: User receives notification when their booking is about to start
-- **NOTF-02**: User receives notification if someone books the slot they were viewing
-
-### Mobile
-
-- **MOBL-01**: Responsive design for mobile browsers
-- **MOBL-02**: Native mobile app
+- **ADMIN-01**: Spec package for the admin app (instance creation, management)
+- **ADMIN-02**: Spec for admin-to-instance deployment pipeline
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
 | Feature | Reason |
 |---------|--------|
-| Multi-day bookings | Current hourly model sufficient for use case |
-| User authentication | Single-user/same-device model works |
-| Admin app changes | This milestone is template repo only |
-| VIC timezone option | NSW covers Sydney/Melbourne users; can add if requested |
-| Automatic Eureka sync | Manual sync acceptable given low change frequency |
+| Dual/eureka version spec | Different architecture, not needed for Rails recreation |
+| Rails implementation | That's the consuming project's job — spec only |
+| Mobile-native specs | Web-first; current form is desktop-focused |
+| Deployment/hosting specs | Rails project has its own infrastructure |
+| Admin app spec | Separate milestone later |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SLOT-01 | Phase 1 | Complete |
-| BOOK-01 | Phase 2 | Complete |
-| BOOK-02 | Phase 2 | Complete |
-| BOOK-03 | Phase 2 | Complete |
-| TIME-01 | Phase 3 | Pending |
-| TIME-02 | Phase 3 | Pending |
-| TIME-03 | Phase 3 | Pending |
-| TIME-04 | Phase 3 | Pending |
-| DEPL-01 | Phase 4 | Pending |
-| DEPL-02 | Phase 4 | Pending |
+| VCAP-01 | — | Pending |
+| VCAP-02 | — | Pending |
+| VCAP-03 | — | Pending |
+| VCAP-04 | — | Pending |
+| VCAP-05 | — | Pending |
+| VCAP-06 | — | Pending |
+| VCAP-07 | — | Pending |
+| VCAP-08 | — | Pending |
+| UIUX-01 | — | Pending |
+| UIUX-02 | — | Pending |
+| UIUX-03 | — | Pending |
+| UIUX-04 | — | Pending |
+| UIUX-05 | — | Pending |
+| UIUX-06 | — | Pending |
+| ARCH-01 | — | Pending |
+| ARCH-02 | — | Pending |
+| ARCH-03 | — | Pending |
+| ARCH-04 | — | Pending |
+| ARCH-05 | — | Pending |
+| FUNC-01 | — | Pending |
+| FUNC-02 | — | Pending |
+| FUNC-03 | — | Pending |
+| FUNC-04 | — | Pending |
+| FUNC-05 | — | Pending |
+| CODE-01 | — | Pending |
+| CODE-02 | — | Pending |
+| CODE-03 | — | Pending |
+| SPEC-01 | — | Pending |
+| SPEC-02 | — | Pending |
+| SPEC-03 | — | Pending |
 
 **Coverage:**
-- v1 requirements: 10 total
-- Mapped to phases: 10
-- Unmapped: 0 ✓
+- v2.0 requirements: 30 total
+- Mapped to phases: 0
+- Unmapped: 30 ⚠️
 
 ---
-*Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Requirements defined: 2026-02-13*
+*Last updated: 2026-02-13 after initial definition*
