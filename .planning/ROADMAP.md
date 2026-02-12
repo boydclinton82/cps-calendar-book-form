@@ -120,10 +120,12 @@ Plans:
   4. All animations and transitions documented (Book Now pulse, slot highlighting, panel slide)
   5. All keyboard shortcuts documented with their conditional behavior rules
   6. Responsive breakpoints documented with mobile/tablet layout adaptations
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 07-01: TBD (to be planned)
+- [ ] 07-01-PLAN.md — Layout structure hierarchy and design token reference (UIUX-01, UIUX-02)
+- [ ] 07-02-PLAN.md — Component state matrices and animation specifications (UIUX-03, UIUX-04)
+- [ ] 07-03-PLAN.md — Keyboard shortcuts and responsive behavior (UIUX-05, UIUX-06)
 
 #### Phase 8: Architecture Documentation
 **Goal**: System internals and data flows documented for Rails reimplementation
@@ -181,7 +183,7 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 4. Deployment | v1.0 | 1/1 | Complete | 2026-02-04 |
 | 5. Visual Capture | v2.0 | 2/2 | Complete | 2026-02-13 |
 | 6. Code Extraction | v2.0 | 3/3 | Complete | 2026-02-13 |
-| 7. UI/UX Documentation | v2.0 | 0/TBD | Not started | - |
+| 7. UI/UX Documentation | v2.0 | 0/3 | Planned | - |
 | 8. Architecture Documentation | v2.0 | 0/TBD | Not started | - |
 | 9. Functional Documentation | v2.0 | 0/TBD | Not started | - |
 | 10. Master Spec Assembly | v2.0 | 0/TBD | Not started | - |
@@ -189,4 +191,4 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13 — Phase 6 complete*
+*Last updated: 2026-02-13 — Phase 7 planned*
