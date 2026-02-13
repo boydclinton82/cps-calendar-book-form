@@ -157,9 +157,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Complete booking lifecycle specification with decision tables and state machines (FUNC-01)
-- [ ] 09-02-PLAN.md — Book Now feature and timezone toggle specifications (FUNC-02, FUNC-03)
-- [ ] 09-03-PLAN.md — Time/date handling and comprehensive edge case catalog (FUNC-04, FUNC-05)
+- [x] 09-01-PLAN.md — Complete booking lifecycle specification with decision tables and state machines (FUNC-01) ✓
+- [x] 09-02-PLAN.md — Book Now feature and timezone toggle specifications (FUNC-02, FUNC-03) ✓
+- [x] 09-03-PLAN.md — Time/date handling and comprehensive edge case catalog (FUNC-04, FUNC-05) ✓
 
 #### Phase 10: Master Spec Assembly
 **Goal**: AI-consumable specification package complete and ready for Rails Claude
@@ -189,10 +189,10 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 6. Code Extraction | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 7. UI/UX Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 8. Architecture Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
-| 9. Functional Documentation | v2.0 | 0/3 | Not started | - |
+| 9. Functional Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 10. Master Spec Assembly | v2.0 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13 — Phase 9 planned (3 plans in 2 waves)*
+*Last updated: 2026-02-13 — Phase 9 complete (3/3 plans, verified 19/19 must-haves)*

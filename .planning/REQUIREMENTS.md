@@ -37,11 +37,11 @@ Requirements for milestone v2.0: Booking Spec Package.
 
 ### Functional Specification
 
-- [ ] **FUNC-01**: Document complete booking flow step-by-step with all decision points
-- [ ] **FUNC-02**: Document Book Now feature with all visibility conditions and interaction flow
-- [ ] **FUNC-03**: Document timezone toggle with DST detection logic and display conversion rules
-- [ ] **FUNC-04**: Document all edge cases (booking conflicts, past hours, multi-hour bookings, midnight boundary, week transitions)
-- [ ] **FUNC-05**: Document time/date handling (QLD timezone storage, slot calculation, current hour logic, week navigation)
+- [x] **FUNC-01**: Document complete booking flow step-by-step with all decision points
+- [x] **FUNC-02**: Document Book Now feature with all visibility conditions and interaction flow
+- [x] **FUNC-03**: Document timezone toggle with DST detection logic and display conversion rules
+- [x] **FUNC-04**: Document all edge cases (booking conflicts, past hours, multi-hour bookings, midnight boundary, week transitions)
+- [x] **FUNC-05**: Document time/date handling (QLD timezone storage, slot calculation, current hour logic, week navigation)
 
 ### Reference Code
 
@@ -97,11 +97,11 @@ Deferred to later milestones.
 | ARCH-03 | Phase 8 | Complete |
 | ARCH-04 | Phase 8 | Complete |
 | ARCH-05 | Phase 8 | Complete |
-| FUNC-01 | Phase 9 | Pending |
-| FUNC-02 | Phase 9 | Pending |
-| FUNC-03 | Phase 9 | Pending |
-| FUNC-04 | Phase 9 | Pending |
-| FUNC-05 | Phase 9 | Pending |
+| FUNC-01 | Phase 9 | Complete |
+| FUNC-02 | Phase 9 | Complete |
+| FUNC-03 | Phase 9 | Complete |
+| FUNC-04 | Phase 9 | Complete |
+| FUNC-05 | Phase 9 | Complete |
 | CODE-01 | Phase 6 | Complete |
 | CODE-02 | Phase 6 | Complete |
 | CODE-03 | Phase 6 | Complete |
@@ -116,4 +116,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-02-13*
-*Traceability updated: 2026-02-13 — Phase 8 ARCH requirements complete*
+*Traceability updated: 2026-02-13 — Phase 9 FUNC requirements complete*
