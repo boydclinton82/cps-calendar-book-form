@@ -169,10 +169,11 @@ Plans:
   1. SPEC.md exists as the entry point with build instructions for Rails Claude Code
   2. Package directory structure documented with "how to use this spec" guide
   3. Technology-neutral system summary exists covering all features and behaviors
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 10-01: TBD (to be planned)
+- [ ] 10-01-PLAN.md — Create SYSTEM-SUMMARY.md and SPEC.md (SPEC-01, SPEC-02, SPEC-03)
+- [ ] 10-02-PLAN.md — Human verification of complete specification package
 
 ## Progress
 
@@ -190,9 +191,9 @@ Phases execute in numeric order: 5 → 6 (can parallel with 5) → 7 → 8 → 9
 | 7. UI/UX Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 8. Architecture Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
 | 9. Functional Documentation | v2.0 | 3/3 | Complete | 2026-02-13 |
-| 10. Master Spec Assembly | v2.0 | 0/TBD | Not started | - |
+| 10. Master Spec Assembly | v2.0 | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-04*
 *v2.0 milestone added: 2026-02-13*
-*Last updated: 2026-02-13 — Phase 9 complete (3/3 plans, verified 19/19 must-haves)*
+*Last updated: 2026-02-13 -- Phase 10 planned (2 plans in 2 waves)*
