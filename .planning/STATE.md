@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 8 complete — ready for Phase 9 (Functional Documentation)
+**Current focus:** Phase 9 complete — ready for Phase 10 (Verification)
 
 ## Current Position
 
 Phase: 9 of 10 (Functional Documentation)
-Plan: 2 of 5 in current phase
-Status: In progress
-Last activity: 2026-02-13 — Completed 09-02-PLAN.md (Book Now, Timezone Toggle)
+Plan: 3 of 3 complete in current phase
+Status: Phase complete
+Last activity: 2026-02-13 — Completed 09-03-PLAN.md (Time/Date Handling, Edge Cases)
 
-Progress: [████████░░] 82% (8 phases complete, 2 plans in phase 9)
+Progress: [█████████░] 90% (9 phases complete)
 
 ## Accumulated Context
 
@@ -64,6 +64,11 @@ Progress: [████████░░] 82% (8 phases complete, 2 plans in ph
 | DST detection must use IANA timezone names | All DST detection uses Intl API with Australia/Sydney timezone name | 09-02 | DST rules change by legislation; IANA database maintained by platform |
 | Timezone preference stored client-side only | Preference in browser localStorage, no server-side storage | 09-02 | Single-instance app, browser-based preference sufficient |
 | Simple offset addition for display conversion | displayHour = storageHour + (isDST ? 1 : 0) instead of full timezone conversion | 09-02 | Known +0/+1 offset, simple arithmetic clearer than conversion library |
+| End-of-hour boundary rule for isSlotPast | Slot is past ONLY when next hour begins (9:00 AM available until 10:00:00) | 09-03 | Users can book "right now" even at :59, improves UX for current-hour booking |
+| Hourly refresh with precision timing | Calculate exact milliseconds until next hour, fire at HH:00:00.000 | 09-03 | Past slots disappear from today's view exactly when hour changes |
+| Multi-hour blocking algorithm documented | Booking at hour H with duration D blocks hours H+1 through H+D-1 (NOT H or H+D) | 09-03 | Clear algorithm prevents off-by-one errors in blocked slot detection |
+| Edge cases organized by category | Categories: Conflicts, Past Hours, Multi-Hour, Week Transitions, Timezone, Polling, Config, Keyboard, Data Integrity | 09-03 | Implementers find all related edge cases together, easier reference |
+| No vague edge case outcomes | Every edge case has specific expected behavior, not "handle gracefully" | 09-03 | Implementers get concrete specifications, not interpretation |
 
 ### Pending Todos
 
@@ -76,7 +81,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 09-02-PLAN.md (Book Now, Timezone Toggle)
+Stopped at: Completed 09-03-PLAN.md (Time/Date Handling, Edge Cases) — Phase 9 complete
 Resume file: None
 
 ---
