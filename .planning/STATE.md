@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 10 in progress — Master Spec Assembly
+**Current focus:** v2.0 milestone complete — all 10 phases shipped
 
 ## Current Position
 
 Phase: 10 of 10 (Master Spec Assembly)
-Plan: 1 of 2 complete in current phase
-Status: In progress
-Last activity: 2026-02-13 — Completed 10-01-PLAN.md (SPEC.md + SYSTEM-SUMMARY.md)
+Plan: 2 of 2 complete in current phase
+Status: Milestone complete
+Last activity: 2026-02-13 — Phase 10 verified and complete, v2.0 shipped
 
-Progress: [█████████░] 90% (9 phases complete, 1 of 2 plans in Phase 10)
+Progress: [██████████] 100% (10 phases complete)
 
 ## Accumulated Context
 
@@ -88,7 +88,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 10-01-PLAN.md (SPEC.md + SYSTEM-SUMMARY.md) — Phase 10 Plan 01 complete
+Stopped at: v2.0 milestone complete — all phases verified
 Resume file: None
 
 ---
