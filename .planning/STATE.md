@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 9 of 10 (Functional Documentation)
-Plan: 1 of 5 in current phase
+Plan: 2 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-13 — Completed 09-01-PLAN.md (BOOKING-FLOW.md)
+Last activity: 2026-02-13 — Completed 09-02-PLAN.md (Book Now, Timezone Toggle)
 
-Progress: [████████░░] 80% (8 phases complete, 1 plan in phase 9)
+Progress: [████████░░] 82% (8 phases complete, 2 plans in phase 9)
 
 ## Accumulated Context
 
@@ -59,6 +59,11 @@ Progress: [████████░░] 80% (8 phases complete, 1 plan in pha
 | Three mutually exclusive interaction modes | NAVIGATION, PANEL, POPUP modes cannot overlap | 09-01 | Prevents UI state conflicts, enables keyboard trap pattern |
 | Decision tables for all conditional logic | 154 table rows document slot click, duration validation, mode transitions, conflicts | 09-01 | Tables reveal gaps prose hides, scannable by AI and humans |
 | Separate conflict logic for create vs extend | canBook() checks all slots, canChangeDuration() checks only new slots | 09-01 | User extending booking shouldn't be blocked by their own occupied slots |
+| Book Now uses internal QLD time | NSW users with timezone toggle see offset display, but Book Now books current QLD hour | 09-02 | "Book now" means current business hour, not current display hour |
+| Book Now visibility hidden (not disabled) | Button completely hidden when unavailable, not shown in disabled state | 09-02 | Clearer UX than disabled button with tooltip |
+| DST detection must use IANA timezone names | All DST detection uses Intl API with Australia/Sydney timezone name | 09-02 | DST rules change by legislation; IANA database maintained by platform |
+| Timezone preference stored client-side only | Preference in browser localStorage, no server-side storage | 09-02 | Single-instance app, browser-based preference sufficient |
+| Simple offset addition for display conversion | displayHour = storageHour + (isDST ? 1 : 0) instead of full timezone conversion | 09-02 | Known +0/+1 offset, simple arithmetic clearer than conversion library |
 
 ### Pending Todos
 
@@ -71,7 +76,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 09-01-PLAN.md (BOOKING-FLOW.md)
+Stopped at: Completed 09-02-PLAN.md (Book Now, Timezone Toggle)
 Resume file: None
 
 ---
