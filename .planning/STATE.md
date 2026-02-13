@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 8 of 10 (Architecture Documentation)
-Plan: 3 of 3 in current phase
-Status: Phase complete — verified 5/5 must-haves
-Last activity: 2026-02-13 — Phase 8 verified and complete
+Phase: 9 of 10 (Functional Documentation)
+Plan: 1 of 5 in current phase
+Status: In progress
+Last activity: 2026-02-13 — Completed 09-01-PLAN.md (BOOKING-FLOW.md)
 
-Progress: [████████░░] 80% (8 phases complete)
+Progress: [████████░░] 80% (8 phases complete, 1 plan in phase 9)
 
 ## Accumulated Context
 
@@ -55,6 +55,10 @@ Progress: [████████░░] 80% (8 phases complete)
 | Complete state replacement (no diffing) | Polling replaces entire bookings object on every tick | 08-03 | Simpler than tracking individual changes, catches all creates/updates/deletes |
 | Optimistic updates for all operations | Makes UI feel instant, errors self-correct via triggerSync | 08-03 | Most operations succeed, rollback on conflict keeps state consistent |
 | Strict state initialization order | Config loads before bookings, bookings load before polling starts | 08-03 | Dependencies must be satisfied for validation and sync to work correctly |
+| Hybrid documentation approach for functional specs | Workflow narratives + decision tables + state machines + Given-When-Then scenarios | 09-01 | AI and developers can scan tables faster than parsing conditional prose |
+| Three mutually exclusive interaction modes | NAVIGATION, PANEL, POPUP modes cannot overlap | 09-01 | Prevents UI state conflicts, enables keyboard trap pattern |
+| Decision tables for all conditional logic | 154 table rows document slot click, duration validation, mode transitions, conflicts | 09-01 | Tables reveal gaps prose hides, scannable by AI and humans |
+| Separate conflict logic for create vs extend | canBook() checks all slots, canChangeDuration() checks only new slots | 09-01 | User extending booking shouldn't be blocked by their own occupied slots |
 
 ### Pending Todos
 
@@ -67,7 +71,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 8 complete — all 3 plans executed, verified 5/5 must-haves
+Stopped at: Completed 09-01-PLAN.md (BOOKING-FLOW.md)
 Resume file: None
 
 ---
