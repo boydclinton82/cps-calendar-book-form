@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Another Claude Code instance can perfectly recreate the single booking form from this spec alone
-**Current focus:** Phase 9 complete — ready for Phase 10 (Verification)
+**Current focus:** Phase 10 in progress — Master Spec Assembly
 
 ## Current Position
 
-Phase: 9 of 10 (Functional Documentation)
-Plan: 3 of 3 complete in current phase
-Status: Phase complete
-Last activity: 2026-02-13 — Completed 09-03-PLAN.md (Time/Date Handling, Edge Cases)
+Phase: 10 of 10 (Master Spec Assembly)
+Plan: 1 of 2 complete in current phase
+Status: In progress
+Last activity: 2026-02-13 — Completed 10-01-PLAN.md (SPEC.md + SYSTEM-SUMMARY.md)
 
-Progress: [█████████░] 90% (9 phases complete)
+Progress: [█████████░] 90% (9 phases complete, 1 of 2 plans in Phase 10)
 
 ## Accumulated Context
 
@@ -69,6 +69,13 @@ Progress: [█████████░] 90% (9 phases complete)
 | Multi-hour blocking algorithm documented | Booking at hour H with duration D blocks hours H+1 through H+D-1 (NOT H or H+D) | 09-03 | Clear algorithm prevents off-by-one errors in blocked slot detection |
 | Edge cases organized by category | Categories: Conflicts, Past Hours, Multi-Hour, Week Transitions, Timezone, Polling, Config, Keyboard, Data Integrity | 09-03 | Implementers find all related edge cases together, easier reference |
 | No vague edge case outcomes | Every edge case has specific expected behavior, not "handle gracefully" | 09-03 | Implementers get concrete specifications, not interpretation |
+| Technology-neutral terminology standard | SYSTEM-SUMMARY.md uses "system", "user", "application" instead of React/Rails-specific terms | 10-01 | Specs transferable to any framework, behavior descriptions don't age |
+| Layered context delivery | SPEC.md → SYSTEM-SUMMARY.md → Phase-specific specs prevents context overload | 10-01 | AI consumes overview first, dives into details as needed |
+| Milestone-based build instructions | 8 dependency-ordered milestones (data → API → logic → UI) instead of feature-based | 10-01 | Enables incremental verification, respects technical dependencies |
+| Three-tier boundary system | Always Do / Ask First / Never Do instead of boolean permissions | 10-01 | Clear autonomous vs review-required actions, reduces interruptions |
+| Observable acceptance criteria | Testable behaviors (e.g., "colors match hex values") not subjective ("looks good") | 10-01 | AI can verify completion objectively, no ambiguity about "done" |
+| Cross-reference density | Heavy linking between docs reduces "where did I see X?" searches | 10-01 | Rails Claude always knows where to find detailed specification |
+| Implementation verification section | Concrete test commands (cURL, visual verification, behavior scenarios) | 10-01 | Rails Claude can self-verify before marking milestone complete |
 
 ### Pending Todos
 
@@ -81,7 +88,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 09-03-PLAN.md (Time/Date Handling, Edge Cases) — Phase 9 complete
+Stopped at: Completed 10-01-PLAN.md (SPEC.md + SYSTEM-SUMMARY.md) — Phase 10 Plan 01 complete
 Resume file: None
 
 ---
