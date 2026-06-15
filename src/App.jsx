@@ -27,7 +27,7 @@ function App() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [useNSWTime, setUseNSWTime] = useState(() => getTimezonePreference());
 
-  const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration, notice, dismissNotice } = useBookings();
+  const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration, notice, dismissNotice } = useBookings({ currentDate, isWeekView });
 
   // Compute visible slots and available slot indices for keyboard navigation
   const dateKey = formatDate(currentDate);

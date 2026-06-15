@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { isSlotBlocked } from '../utils/time';
+import { getStartOfWeek, addDays, formatDate, isSlotBlocked } from '../utils/time';
 import {
   fetchBookings as apiFetchBookings,
   createBooking as apiCreateBooking,
@@ -23,7 +23,20 @@ function noticeForError(err) {
   return 'Could not save that booking. Please try again.';
 }
 
-export function useBookings() {
+// Compute the visible [from, to] window the server should return. Day view is a
+// single day; week view is the 7 days starting at the week's start. In blob mode
+// the server ignores the range and returns everything, so this is harmless there.
+function computeRange(currentDate, isWeekView) {
+  const base = currentDate || new Date();
+  if (isWeekView) {
+    const start = getStartOfWeek(base);
+    return { from: formatDate(start), to: formatDate(addDays(start, 6)) };
+  }
+  const d = formatDate(base);
+  return { from: d, to: d };
+}
+
+export function useBookings({ currentDate, isWeekView } = {}) {
   const [bookings, setBookings] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,25 +44,10 @@ export function useBookings() {
   // A ref so writing it never re-renders and keeps handlePollingUpdate stable.
   const pendingRef = useRef(new Map());
   const [notice, setNotice] = useState(null);
-
-  // Initial fetch on mount
-  useEffect(() => {
-    const loadBookings = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await apiFetchBookings();
-        setBookings(data || {});
-      } catch (err) {
-        console.error('Failed to load bookings:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadBookings();
-  }, []);
+  // Current visible window, kept in a ref so the (stable) poller always reads
+  // the latest range without re-subscribing on every navigation.
+  const rangeRef = useRef(computeRange(currentDate, isWeekView));
+  const fetchForRange = useCallback(() => apiFetchBookings(rangeRef.current), []);
 
   // Handle updates from polling. MERGE the server snapshot with any in-flight
   // optimistic ops so a just-made booking is not wiped off the booker's screen
@@ -75,15 +73,38 @@ export function useBookings() {
     });
   }, []);
 
-  // Setup polling for real-time sync (only when API is enabled)
+  // Setup polling for real-time sync (only when API is enabled). The poller reads
+  // the current visible range via fetchForRange.
   const { triggerSync } = usePollingSync(
-    apiFetchBookings,
+    fetchForRange,
     handlePollingUpdate,
     {
       interval: POLLING_INTERVAL,
       enabled: isApiEnabled(),
     }
   );
+
+  // Fetch the visible window on mount and whenever navigation changes it. Apply
+  // the snapshot through handlePollingUpdate so in-flight optimistic ops survive.
+  useEffect(() => {
+    const r = computeRange(currentDate, isWeekView);
+    rangeRef.current = r;
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await apiFetchBookings(r);
+        if (!cancelled) handlePollingUpdate(data || {});
+      } catch (err) {
+        console.error('Failed to load bookings:', err);
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [currentDate, isWeekView, handlePollingUpdate]);
 
   const getBookingsForDate = useCallback((date) => {
     return bookings[date] || {};

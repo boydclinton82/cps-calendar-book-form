@@ -90,3 +90,71 @@ if next(day) == nil then data[date] = nil end
 if next(data) == nil then redis.call('SET', KEYS[1], '{}') else redis.call('SET', KEYS[1], cjson.encode(data)) end
 return 'OK'
 `;
+
+// ---------------------------------------------------------------------------
+// PER-DAY HASH MODEL (KEYS[1] = instance:<slug>:bookings:<date>)
+// Field = "HH:00", value = JSON {user, duration}. Same overlap correctness as the
+// blob scripts above, but scoped to one day so a write is O(one day), not O(all dates).
+// ---------------------------------------------------------------------------
+
+// CREATE_DAY: ARGV = [hour, user, duration]
+// Returns: 'OK' | 'CONFLICT' | 'BADTIME'
+export const CREATE_BOOKING_DAY_LUA = `
+local hour = ARGV[1]
+local user = ARGV[2]
+local duration = tonumber(ARGV[3])
+local startH = tonumber(string.sub(hour, 1, 2))
+if startH == nil or duration == nil then return 'BADTIME' end
+-- half-open overlap test against every existing booking in this day, both directions
+local arr = redis.call('HGETALL', KEYS[1])
+for i = 1, #arr, 2 do
+  local exH = tonumber(string.sub(arr[i], 1, 2))
+  local rec = cjson.decode(arr[i + 1])
+  local exDur = tonumber(rec.duration) or 1
+  if exH ~= nil and exH < (startH + duration) and startH < (exH + exDur) then
+    return 'CONFLICT'
+  end
+end
+redis.call('HSET', KEYS[1], hour, cjson.encode({ user = user, duration = duration }))
+return 'OK'
+`;
+
+// UPDATE_DAY: ARGV = [hour, newUser('' = keep), newDuration('' = keep)]
+// Returns: 'NOTFOUND' | 'CONFLICT' | the stored record as JSON (auto-parsed by the SDK)
+export const UPDATE_BOOKING_DAY_LUA = `
+local hour = ARGV[1]
+local raw = redis.call('HGET', KEYS[1], hour)
+if not raw then return 'NOTFOUND' end
+local cur = cjson.decode(raw)
+local startH = tonumber(string.sub(hour, 1, 2))
+local curDur = tonumber(cur.duration) or 1
+if ARGV[3] ~= '' then
+  local newDur = tonumber(ARGV[3])
+  if newDur ~= nil and newDur > curDur then
+    -- full half-open interval test against OTHER bookings (fixes the weak blob check)
+    local arr = redis.call('HGETALL', KEYS[1])
+    for i = 1, #arr, 2 do
+      if arr[i] ~= hour then
+        local exH = tonumber(string.sub(arr[i], 1, 2))
+        local rec = cjson.decode(arr[i + 1])
+        local exDur = tonumber(rec.duration) or 1
+        if exH ~= nil and exH < (startH + newDur) and startH < (exH + exDur) then
+          return 'CONFLICT'
+        end
+      end
+    end
+  end
+  cur.duration = newDur
+end
+if ARGV[2] ~= '' then cur.user = ARGV[2] end
+redis.call('HSET', KEYS[1], hour, cjson.encode(cur))
+return cjson.encode(cur)
+`;
+
+// DELETE_DAY: ARGV = [hour]
+// Returns: 'OK' | 'NOTFOUND'  (Redis auto-removes the hash when its last field goes)
+export const DELETE_BOOKING_DAY_LUA = `
+local removed = redis.call('HDEL', KEYS[1], ARGV[1])
+if removed == 0 then return 'NOTFOUND' end
+return 'OK'
+`;
