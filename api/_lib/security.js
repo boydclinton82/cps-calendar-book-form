@@ -108,6 +108,18 @@ function sanitizeString(str) {
     .slice(0, 100); // Limit length
 }
 
+// Bookable window (mirror of src/utils/time.js START_HOUR/END_HOUR). Enforced
+// server-side so a direct API call cannot create a booking that runs past 22:00 /
+// across midnight — which the per-day model relies on.
+const BOOKABLE_START = 6;
+const BOOKABLE_END = 22;
+
+function isWithinBookableWindow(timeKey, duration) {
+  const startH = parseInt(String(timeKey).slice(0, 2), 10);
+  if (Number.isNaN(startH)) return false;
+  return startH >= BOOKABLE_START && (startH + Number(duration)) <= BOOKABLE_END;
+}
+
 /**
  * Sanitize booking input
  */
@@ -183,4 +195,4 @@ export function withSecurity(handler, options = {}) {
   };
 }
 
-export { sanitizeBookingInput, sanitizeString };
+export { sanitizeBookingInput, sanitizeString, isWithinBookableWindow };

@@ -72,15 +72,17 @@ export async function fetchConfig() {
 }
 
 /**
- * Fetch all bookings
+ * Fetch bookings. Pass an optional { from, to } range to fetch only the visible
+ * window (per-day mode); with no range the server returns everything (blob mode).
  */
-export async function fetchBookings() {
+export async function fetchBookings(range) {
   if (!USE_API) {
     return localStorage.getBookings();
   }
 
   try {
-    return await apiRequest('/bookings');
+    const qs = range?.from && range?.to ? `?from=${range.from}&to=${range.to}` : '';
+    return await apiRequest(`/bookings${qs}`);
   } catch (error) {
     console.warn('API unavailable, falling back to localStorage');
     return localStorage.getBookings();
