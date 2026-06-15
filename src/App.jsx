@@ -4,6 +4,7 @@ import { TimeStrip } from './components/TimeStrip';
 import { BookingPanel } from './components/BookingPanel';
 import { BookingPopup } from './components/BookingPopup';
 import { WeekView } from './components/WeekView';
+import { Notice } from './components/Notice';
 import { useBookings } from './hooks/useBookings';
 import { getTimezonePreference, saveTimezonePreference } from './utils/storage';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -26,7 +27,7 @@ function App() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [useNSWTime, setUseNSWTime] = useState(() => getTimezonePreference());
 
-  const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration } = useBookings();
+  const { bookings, createBooking, removeBooking, updateBooking, getSlotStatus, canBook, canChangeDuration, notice, dismissNotice } = useBookings();
 
   // Compute visible slots and available slot indices for keyboard navigation
   const dateKey = formatDate(currentDate);
@@ -393,6 +394,8 @@ function App() {
       {selectedSlot && (
         <div className="panel-overlay" onClick={handleCancelPanel} />
       )}
+
+      <Notice message={notice} onDismiss={dismissNotice} />
     </div>
   );
 }

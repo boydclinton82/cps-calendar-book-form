@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { isSlotBlocked } from '../utils/time';
 import {
   fetchBookings as apiFetchBookings,
@@ -12,10 +12,25 @@ import { usePollingSync } from './usePollingSync';
 // Polling interval in milliseconds
 const POLLING_INTERVAL = 7000;
 
+const pkey = (date, time) => `${date}|${time}`;
+
+// Map a thrown API error to a user-facing notice (no em dashes).
+function noticeForError(err) {
+  const msg = (err && err.message) || '';
+  if (/booked|already/i.test(msg)) {
+    return 'That time was just booked by someone else. Please pick another slot.';
+  }
+  return 'Could not save that booking. Please try again.';
+}
+
 export function useBookings() {
   const [bookings, setBookings] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // `${date}|${time}` -> optimistic booking, or null for an in-flight delete.
+  // A ref so writing it never re-renders and keeps handlePollingUpdate stable.
+  const pendingRef = useRef(new Map());
+  const [notice, setNotice] = useState(null);
 
   // Initial fetch on mount
   useEffect(() => {
@@ -36,11 +51,28 @@ export function useBookings() {
     loadBookings();
   }, []);
 
-  // Handle updates from polling
+  // Handle updates from polling. MERGE the server snapshot with any in-flight
+  // optimistic ops so a just-made booking is not wiped off the booker's screen
+  // before the server confirms it.
   const handlePollingUpdate = useCallback((data) => {
-    if (data && typeof data === 'object') {
-      setBookings(data);
-    }
+    if (!data || typeof data !== 'object') return;
+    setBookings(() => {
+      const merged = {};
+      for (const date of Object.keys(data)) merged[date] = { ...data[date] };
+      for (const [pk, optimistic] of pendingRef.current.entries()) {
+        const [date, time] = pk.split('|');
+        if (optimistic === null) {
+          if (merged[date]) {
+            delete merged[date][time];
+            if (Object.keys(merged[date]).length === 0) delete merged[date];
+          }
+        } else {
+          if (!merged[date]) merged[date] = {};
+          merged[date][time] = optimistic;
+        }
+      }
+      return merged;
+    });
   }, []);
 
   // Setup polling for real-time sync (only when API is enabled)
@@ -58,65 +90,94 @@ export function useBookings() {
   }, [bookings]);
 
   const createBooking = useCallback(async (date, time, user, duration) => {
+    const pk = pkey(date, time);
+    const optimistic = { user, duration };
+    // Register pending BEFORE the optimistic write so a poll mid-flight re-applies it.
+    pendingRef.current.set(pk, optimistic);
+
     // Optimistic update
     setBookings((prev) => {
       const newBookings = { ...prev };
-      if (!newBookings[date]) {
-        newBookings[date] = {};
-      }
-      newBookings[date] = {
-        ...newBookings[date],
-        [time]: { user, duration },
-      };
+      newBookings[date] = { ...(newBookings[date] || {}), [time]: optimistic };
       return newBookings;
     });
 
     try {
-      await apiCreateBooking({
-        dateKey: date,
-        timeKey: time,
-        user,
-        duration,
-      });
+      const res = await apiCreateBooking({ dateKey: date, timeKey: time, user, duration });
+      // Reconcile from the server response (write only { user, duration }).
+      const b = res?.booking;
+      if (b) {
+        const reconciled = { user: b.user, duration: b.duration };
+        pendingRef.current.set(pk, reconciled);
+        setBookings((prev) => {
+          const newBookings = { ...prev };
+          newBookings[date] = { ...(newBookings[date] || {}), [time]: reconciled };
+          return newBookings;
+        });
+      }
     } catch (err) {
-      // Rollback on error
       console.error('Failed to create booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
+      // Roll back THAT slot only.
+      setBookings((prev) => {
+        const newBookings = { ...prev };
+        if (newBookings[date]) {
+          newBookings[date] = { ...newBookings[date] };
+          delete newBookings[date][time];
+          if (Object.keys(newBookings[date]).length === 0) delete newBookings[date];
+        }
+        return newBookings;
+      });
+      setNotice(noticeForError(err));
       triggerSync();
+    } finally {
+      pendingRef.current.delete(pk);
     }
   }, [triggerSync]);
 
   const removeBooking = useCallback(async (date, time) => {
+    const pk = pkey(date, time);
+    const previousBooking = bookings[date]?.[time];
+    // Register pending delete (null) BEFORE the optimistic write.
+    pendingRef.current.set(pk, null);
+
     // Optimistic update
     setBookings((prev) => {
       const newBookings = { ...prev };
       if (newBookings[date] && newBookings[date][time]) {
+        newBookings[date] = { ...newBookings[date] };
         delete newBookings[date][time];
-        if (Object.keys(newBookings[date]).length === 0) {
-          delete newBookings[date];
-        }
+        if (Object.keys(newBookings[date]).length === 0) delete newBookings[date];
       }
       return newBookings;
     });
 
     try {
-      await apiDeleteBooking({
-        dateKey: date,
-        timeKey: time,
-      });
+      await apiDeleteBooking({ dateKey: date, timeKey: time });
     } catch (err) {
-      // Rollback on error
       console.error('Failed to delete booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
+      // Restore the specific booking we removed.
+      if (previousBooking) {
+        setBookings((prev) => {
+          const newBookings = { ...prev };
+          newBookings[date] = { ...(newBookings[date] || {}), [time]: previousBooking };
+          return newBookings;
+        });
+      }
+      setNotice(noticeForError(err));
       triggerSync();
+    } finally {
+      pendingRef.current.delete(pk);
     }
-  }, [triggerSync]);
+  }, [bookings, triggerSync]);
 
   const updateBooking = useCallback(async (date, time, updates) => {
+    const pk = pkey(date, time);
     // Store previous value for rollback
     const previousBooking = bookings[date]?.[time];
+    const optimistic = { ...(previousBooking || {}), ...updates };
+    pendingRef.current.set(pk, optimistic);
 
     // Optimistic update
     setBookings((prev) => {
@@ -131,17 +192,34 @@ export function useBookings() {
     });
 
     try {
-      await apiUpdateBooking({
-        dateKey: date,
-        timeKey: time,
-        updates,
-      });
+      const res = await apiUpdateBooking({ dateKey: date, timeKey: time, updates });
+      // PUT returns the full stored { user, duration } - write it directly.
+      const b = res?.booking;
+      if (b) {
+        pendingRef.current.set(pk, b);
+        setBookings((prev) => {
+          const newBookings = { ...prev };
+          if (newBookings[date]) {
+            newBookings[date] = { ...newBookings[date], [time]: b };
+          }
+          return newBookings;
+        });
+      }
     } catch (err) {
-      // Rollback on error
       console.error('Failed to update booking:', err);
       setError(err.message);
-      // Trigger sync to get correct state
+      // Restore previous value.
+      if (previousBooking) {
+        setBookings((prev) => {
+          const newBookings = { ...prev };
+          newBookings[date] = { ...(newBookings[date] || {}), [time]: previousBooking };
+          return newBookings;
+        });
+      }
+      setNotice(noticeForError(err));
       triggerSync();
+    } finally {
+      pendingRef.current.delete(pk);
     }
   }, [bookings, triggerSync]);
 
@@ -228,6 +306,8 @@ export function useBookings() {
     bookings,
     loading,
     error,
+    notice,
+    dismissNotice: useCallback(() => setNotice(null), []),
     getBookingsForDate,
     createBooking,
     removeBooking,
