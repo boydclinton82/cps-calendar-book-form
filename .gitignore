@@ -28,3 +28,18 @@ npm-debug.log*
 .claude/
 .vercel
 .env*.local
+
+# Secrets and local working files (never commit)
+.env.production
+.env.temp
+
+# Planning, session notes, and scratch assets
+.planning/
+scripts/
+images/
+SESSION_*.md
+SESSION-*.md
+image.png
+image_edited.jpg
+img0002.jpg
+BOOKING-RACE-FIX-PLAN.md

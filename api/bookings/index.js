@@ -1,5 +1,7 @@
 import { kv } from '@vercel/kv';
 import { withSecurity, sanitizeBookingInput } from '../_lib/security.js';
+import { CREATE_BOOKING_LUA } from '../_lib/booking-scripts.js';
+import { logAudit, getClientIp } from '../_lib/audit.js';
 
 /**
  * GET /api/bookings - Get all bookings
@@ -34,39 +36,23 @@ async function handler(req, res) {
         });
       }
 
-      // Get current bookings
-      let bookings = await kv.get(key) || {};
+      // Atomic claim: GET -> check overlap -> SET inside one EVAL, so concurrent
+      // POSTs cannot lose each other's writes (fixes the lost-update race).
+      const result = await kv.eval(
+        CREATE_BOOKING_LUA,
+        [key],
+        [dateKey, timeKey, user, String(duration)]
+      );
 
-      // Initialize date if not exists
-      if (!bookings[dateKey]) {
-        bookings[dateKey] = {};
+      if (result === 'BADTIME') {
+        return res.status(400).json({ error: 'Invalid time or duration' });
+      }
+      if (result === 'CONFLICT') {
+        await logAudit({ action: 'conflict', dateKey, timeKey, user, duration, ip: getClientIp(req), result: 'conflict' });
+        return res.status(409).json({ error: 'Slot already booked' });
       }
 
-      // Check if slot is already booked
-      if (bookings[dateKey][timeKey]) {
-        return res.status(409).json({
-          error: 'Slot already booked'
-        });
-      }
-
-      // Check if duration would overlap with existing bookings
-      const startHour = parseInt(timeKey.split(':')[0], 10);
-      for (let i = 1; i < duration; i++) {
-        const checkHour = startHour + i;
-        const checkKey = `${checkHour.toString().padStart(2, '0')}:00`;
-        if (bookings[dateKey][checkKey]) {
-          return res.status(409).json({
-            error: `Slot ${checkKey} conflicts with booking duration`
-          });
-        }
-      }
-
-      // Create the booking
-      bookings[dateKey][timeKey] = { user, duration };
-
-      // Save to KV
-      await kv.set(key, bookings);
-
+      await logAudit({ action: 'create', dateKey, timeKey, user, duration, ip: getClientIp(req), result: 'ok' });
       return res.status(201).json({
         success: true,
         booking: { dateKey, timeKey, user, duration }

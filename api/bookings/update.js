@@ -1,5 +1,7 @@
 import { kv } from '@vercel/kv';
 import { withSecurity, sanitizeBookingInput } from '../_lib/security.js';
+import { UPDATE_BOOKING_LUA, DELETE_BOOKING_LUA } from '../_lib/booking-scripts.js';
+import { logAudit, getClientIp } from '../_lib/audit.js';
 
 /**
  * PUT /api/bookings/update - Update an existing booking
@@ -22,45 +24,28 @@ async function handler(req, res) {
         });
       }
 
-      // Get current bookings
-      let bookings = await kv.get(key) || {};
+      // Atomic update inside one EVAL (read-modify-write cannot race).
+      const result = await kv.eval(
+        UPDATE_BOOKING_LUA,
+        [key],
+        [
+          dateKey,
+          timeKey,
+          updates.user != null ? String(updates.user) : '',
+          updates.duration != null ? String(updates.duration) : '',
+        ]
+      );
 
-      // Check if booking exists
-      if (!bookings[dateKey] || !bookings[dateKey][timeKey]) {
-        return res.status(404).json({ error: 'Booking not found' });
+      if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
+      if (result === 'CONFLICT') {
+        await logAudit({ action: 'conflict', dateKey, timeKey, ip: getClientIp(req), result: 'conflict' });
+        return res.status(409).json({ error: 'Cannot extend: slot is already booked' });
       }
 
-      const currentBooking = bookings[dateKey][timeKey];
-
-      // If duration is being changed, check for conflicts
-      if (updates.duration && updates.duration !== currentBooking.duration) {
-        const startHour = parseInt(timeKey.split(':')[0], 10);
-
-        // Check new slots (beyond current duration)
-        for (let i = currentBooking.duration; i < updates.duration; i++) {
-          const checkHour = startHour + i;
-          const checkKey = `${checkHour.toString().padStart(2, '0')}:00`;
-          if (bookings[dateKey][checkKey]) {
-            return res.status(409).json({
-              error: `Cannot extend: slot ${checkKey} is already booked`
-            });
-          }
-        }
-      }
-
-      // Update the booking
-      bookings[dateKey][timeKey] = {
-        ...currentBooking,
-        ...updates,
-      };
-
-      // Save to KV
-      await kv.set(key, bookings);
-
-      return res.status(200).json({
-        success: true,
-        booking: bookings[dateKey][timeKey]
-      });
+      const fresh = await kv.get(key);
+      const booking = fresh?.[dateKey]?.[timeKey] || null;
+      await logAudit({ action: 'update', dateKey, timeKey, user: booking?.user, duration: booking?.duration, ip: getClientIp(req), result: 'ok' });
+      return res.status(200).json({ success: true, booking });
     }
 
     if (req.method === 'DELETE') {
@@ -75,25 +60,11 @@ async function handler(req, res) {
         });
       }
 
-      // Get current bookings
-      let bookings = await kv.get(key) || {};
+      // Atomic delete inside one EVAL.
+      const result = await kv.eval(DELETE_BOOKING_LUA, [key], [dateKey, timeKey]);
+      if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
 
-      // Check if booking exists
-      if (!bookings[dateKey] || !bookings[dateKey][timeKey]) {
-        return res.status(404).json({ error: 'Booking not found' });
-      }
-
-      // Delete the booking
-      delete bookings[dateKey][timeKey];
-
-      // Clean up empty date objects
-      if (Object.keys(bookings[dateKey]).length === 0) {
-        delete bookings[dateKey];
-      }
-
-      // Save to KV
-      await kv.set(key, bookings);
-
+      await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'ok' });
       return res.status(200).json({ success: true });
     }
 
