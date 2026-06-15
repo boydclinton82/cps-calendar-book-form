@@ -14,6 +14,35 @@
 > loss** today, so this migration is not under time pressure. Roll it out slowly and
 > reversibly. Nothing in this plan has been implemented yet.
 
+> ## ✅ ROLLOUT COMPLETE — 2026-06-15
+>
+> Implemented (PR #1 atomic hotfix already live; per-day work merged via PR #2,
+> commit `54b7cf8` on `main`) **and rolled out to all 3 production instances**.
+> `BOOKING_MODEL=perday` is set + redeployed on each; per-day mode confirmed active
+> in production and client data verified intact (per-day data exact-matches the
+> pre-migration blob on every instance):
+>
+> | Vercel project | slug | data migrated |
+> |---|---|---|
+> | `booking-insight` | `insight` | 89 days / 208 bookings |
+> | `booking-bmo-financial-solutions` | `bmo-financial-solutions` | 13 days / 15 bookings |
+> | `booking-eclipse` | `eclipse` | 10 days / 13 bookings |
+>
+> Verified end to end: ranged-read discriminator (single-day query returns only that
+> day = per-day routing live), `readAll` counts == original blob, and a full
+> create→read→update→delete smoke test on `booking-eclipse` (incl. the UPDATE_DAY
+> JSON-record return auto-parsing correctly). The old `instance:<slug>:bookings`
+> blobs are **left intact as the rollback net** (see §11 cleanup — not yet done).
+>
+> **Rollback** = unset `BOOKING_MODEL` + redeploy (instant); run
+> `scripts/rollback-perday.mjs` first if per-day received writes you must preserve.
+>
+> **Deploy quirk:** `vercel --prod` from this repo fails ("Upload aborted") because
+> the repo lives in iCloud Drive. Use `vercel redeploy <prod-url> --scope
+> clinton-clintonweekes-projects` (rebuilds from stored source, picks up new env
+> vars) or push to `main`. A fresh deploy is **required** after changing the env var
+> — `PERDAY` is read at module load.
+
 ---
 
 ## 0. TL;DR of what you are building
