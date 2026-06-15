@@ -8,7 +8,12 @@ export function enumerateDates(from, to) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) return null;
   const start = new Date(`${from}T00:00:00Z`);
   const end = new Date(`${to}T00:00:00Z`);
-  if (Number.isNaN(start) || Number.isNaN(end) || end < start) return null;
+  // Reject not just Invalid Date but also calendar rollover (e.g. 2026-02-30 ->
+  // 2026-03-02): require the parsed date to round-trip back to the input string.
+  // (NaN check first: toISOString() throws on an Invalid Date.)
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+  if (start.toISOString().slice(0, 10) !== from || end.toISOString().slice(0, 10) !== to) return null;
+  if (end < start) return null;
   const out = [];
   for (let d = start; d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
     out.push(d.toISOString().slice(0, 10));
