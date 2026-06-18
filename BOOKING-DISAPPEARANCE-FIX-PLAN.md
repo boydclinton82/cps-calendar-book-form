@@ -104,7 +104,7 @@ Adam's remained. He re-booked and it stuck.
 
 | ID | Slice | Priority | Status | CPM | Depends on |
 |----|-------|----------|--------|-----|-----------|
-| S0 | Pull Vercel runtime logs for trigger evidence (time-sensitive) | P3 | ⬜ | no (read-only) | — |
+| S0 | Pull Vercel runtime logs for trigger evidence (time-sensitive) | P3 | ⏭️ | no (read-only) | — |
 | S1 | Client: confirm-before-commit + surface failures | P1 | ✅ | yes | — |
 | S2 | Server: audit every rejection/error path | P2 | ✅ | yes | — |
 | S3 | Render: fix booking-block misalignment | P4 | ✅ | yes | — |
@@ -559,3 +559,25 @@ data-loss path is closed in production.
 - **Status:** **the booking-disappearance fix is LIVE and verified on `insight`** (and eclipse/bmo).
   Remaining work is optional only: **S0** (pull runtime logs — diagnostic, may be expired) and **S4**
   (atomic rate limiter — CPM: hold).
+
+### 2026-06-18 — S0 closed: runtime logs expired / inconclusive (read-only, no code change)
+
+- **Goal:** confirm which trigger fired for Joel's first (lost) attempt, ~11:29-12:21 AEST
+  (01:29-02:21 UTC) on 2026-06-18 — a 500/EVAL-throw (`Error handling bookings:`), a 429
+  rate-limit, or no server hit at all.
+- **Identified the live project:** `vercel ls booking-insight --prod --scope
+  clinton-clintonweekes-projects` lists the prod deployments. The deployment live at incident time
+  (~16h before this run) was one of the then-3-day-old builds (e.g. `…-7qdjpky2u…`); the 6m–1h-old
+  deployments are this session's S1/S2/S3 merge redeploys.
+- **What the CLI does:** `vercel logs <deployment-url> --scope …` (CLI v46.1.1) is **live-tail
+  only** — it printed *"Displaying runtime logs … starting from Jun Th 14:39:44"* (i.e. now) then
+  *"waiting for new logs…"*. There is no `--since`/`--until` historical flag in this version, and
+  Vercel's runtime-log retention is short, so the 16h-old incident logs are **unavailable**.
+- **Finding: EXPIRED / INCONCLUSIVE.** Could not retrieve the historical runtime logs, so the exact
+  trigger for the first lost attempt cannot be confirmed from logs. No `Error handling bookings:`
+  or `429` evidence either way. This is the expected, acceptable outcome noted in the S0 plan.
+- **Why it's moot going forward:** S2 (shipped + verified live) now writes an audit event on every
+  rejection/error path, so any *future* occurrence is fully diagnosable from the KV audit log alone
+  — no reliance on ephemeral runtime logs. S0 was "close the question," not a blocker.
+- **CPM:** none (read-only diagnostic; no code change). `.planning/STATE.md` left untouched.
+- **Remaining work:** only **S4** (atomic rate limiter, P5, CPM: hold). No urgency.
