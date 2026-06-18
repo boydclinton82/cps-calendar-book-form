@@ -1,4 +1,8 @@
 import { kv } from '@vercel/kv';
+import { logAudit, getClientIp } from './audit.js';
+
+// Map HTTP method -> audit action, for write-path observability.
+const METHOD_ACTION = { POST: 'create', PUT: 'update', DELETE: 'delete', GET: 'read' };
 
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
@@ -184,6 +188,13 @@ export function withSecurity(handler, options = {}) {
       res.setHeader('X-RateLimit-Remaining', remaining.toString());
 
       if (!allowed) {
+        await logAudit({
+          action: METHOD_ACTION[req.method] || 'read',
+          dateKey: req.body?.dateKey,
+          timeKey: req.body?.timeKey,
+          ip: getClientIp(req),
+          result: 'reject_ratelimit',
+        });
         return res.status(429).json({
           error: 'Too many requests. Please try again later.'
         });

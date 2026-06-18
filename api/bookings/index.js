@@ -38,6 +38,7 @@ async function handler(req, res) {
 
       // Validate required fields
       if (!dateKey || !timeKey || !user || !duration) {
+        await logAudit({ action: 'create', dateKey, timeKey, user, duration, ip: getClientIp(req), result: 'reject_validation' });
         return res.status(400).json({
           error: 'Missing or invalid fields: dateKey, timeKey, user, duration'
         });
@@ -46,6 +47,7 @@ async function handler(req, res) {
       // Reject anything outside the bookable window server-side, so a booking can
       // never run past 22:00 / across midnight (the per-day model relies on this).
       if (!isWithinBookableWindow(timeKey, duration)) {
+        await logAudit({ action: 'create', dateKey, timeKey, user, duration, ip: getClientIp(req), result: 'reject_window' });
         return res.status(400).json({ error: 'Outside bookable hours (06:00-22:00)' });
       }
 
@@ -57,6 +59,7 @@ async function handler(req, res) {
         : await kv.eval(CREATE_BOOKING_LUA, [key], [dateKey, timeKey, user, String(duration)]);
 
       if (result === 'BADTIME') {
+        await logAudit({ action: 'create', dateKey, timeKey, user, duration, ip: getClientIp(req), result: 'reject_badtime' });
         return res.status(400).json({ error: 'Invalid time or duration' });
       }
       if (result === 'CONFLICT') {
@@ -76,6 +79,16 @@ async function handler(req, res) {
 
   } catch (error) {
     console.error('Error handling bookings:', error);
+    await logAudit({
+      action: req.method === 'POST' ? 'create' : 'read',
+      dateKey: req.body?.dateKey,
+      timeKey: req.body?.timeKey,
+      user: req.body?.user,
+      duration: req.body?.duration,
+      ip: getClientIp(req),
+      result: 'error',
+      error: String(error?.message),
+    });
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
