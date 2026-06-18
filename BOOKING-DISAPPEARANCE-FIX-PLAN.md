@@ -109,7 +109,7 @@ Adam's remained. He re-booked and it stuck.
 | S2 | Server: audit every rejection/error path | P2 | ✅ | yes | — |
 | S3 | Render: fix booking-block misalignment | P4 | ✅ | yes | — |
 | S4 | Server: make the rate limiter atomic (stretch) | P5 | ⬜ | hold | S2 |
-| S5 | Production rollout + live verification across instances | P1 | ⬜ | no (deploy) | S1, S2, S3 |
+| S5 | Production rollout + live verification across instances | P1 | ✅ | no (deploy) | S1, S2, S3 |
 
 > S0 is independent and **time-sensitive** (log retention is short). Do it first if possible,
 > but it does not block any code slice. S1/S2/S3 are independent of each other and can be done
@@ -358,29 +358,49 @@ path used by all instances).
 data-loss path is closed in production.
 
 **Tasks**
-- [ ] **Pre-snapshot (do FIRST, per the Data-preservation guardrail).** Read-only dump of every
+- [x] **Pre-snapshot (do FIRST, per the Data-preservation guardrail).** Read-only dump of every
       TODAY-or-later booking from all three instances' KV. Save the dump in the session so any
       dropped slot can be re-added afterwards. Past-time slots can be ignored.
-- [ ] Confirm HOW instances receive code: are the 3 instances (insight, eclipse,
+      *(Done: `scripts/snapshot-future.mjs` (READ-ONLY token) → `.planning/S5-presnapshot-2026-06-18T04-16-48Z.json`.
+      insight = 3 today bookings (Adam 12:00/1, Joel 13:00/3, Joel 16:00/1); eclipse/bmo = 0 today-or-later.)*
+- [x] Confirm HOW instances receive code: are the 3 instances (insight, eclipse,
       bmo-financial-solutions) separate Vercel projects auto-deploying from `main`, or do they
       need manual redeploy? (Last session used `vercel redeploy <id>` because `vercel --prod`
       fails from this iCloud folder.) Record the answer.
-- [ ] Roll out in canary order: **eclipse → bmo-financial-solutions → insight** (insight last).
-- [ ] **Post-deploy diff + restore.** After each instance redeploys, re-read its KV and diff
+      *(Answer: **separate Vercel projects, each git-connected to `main`, auto-deploy on merge.**
+      Each has a `booking-<slug>-git-main` alias; all three live aliases were created 14:06:59 AEST,
+      3s after merge `153f390` (14:06:56). So S1+S2+S3 auto-shipped to all three when the PRs merged.
+      No manual `vercel redeploy` needed — the canary order is moot since merge fans out to all 3 at once.)*
+- [x] Roll out in canary order: **eclipse → bmo-financial-solutions → insight** (insight last).
+      *(N/A as a manual step — auto-deploy delivered all three simultaneously on the `main` merge. No
+      redundant redeploys issued. Verification below was still run eclipse → bmo → insight.)*
+- [x] **Post-deploy diff + restore.** After each instance redeploys, re-read its KV and diff
       against the pre-snapshot. Re-add (overwrite the slot with the saved value) any today/future
       booking that went missing. Never prune a slot absent from the pre-snapshot.
-- [ ] After each: smoke test a far-future slot (create → refresh → still there; force a failure →
+      *(Code deploy does not touch KV; final diff vs pre-snapshot = ALL PRESENT & UNCHANGED on all
+      three. Nothing dropped, nothing to restore.)*
+- [x] After each: smoke test a far-future slot (create → refresh → still there; force a failure →
       notice shown, slot rolls back). Confirm via the audit log that events now cover failures.
-- [ ] Verify on `insight` specifically that a booking shown as saved survives refresh, and a
+      *(Server: `POST {}` → 400 on all three → fresh `reject_validation` audit event on each (pre-S2
+      wrote none) — S2 live everywhere. Client (insight): far-future Joel 6-7AM/Jun-30 create →
+      survived hard refresh → deleted (KV Jun-30 = empty). Forced failure via one-shot fetch stub
+      (success:true, no booking) → notice "...Please try again." + slot rolled back, stub fired so
+      no server write.)*
+- [x] Verify on `insight` specifically that a booking shown as saved survives refresh, and a
       failed save surfaces a notice.
+      *(Both done live on booking-insight.vercel.app — see Progress Log.)*
 - [ ] Update `.planning/STATE.md` / `HANDOFF.md` to reflect the shipped fix.
+      *(Skipped: `.planning/STATE.md` is a stale Feb v2.0 snapshot, unrelated to this work — left
+      untouched per session handoff. This plan doc is the source of truth and is updated here.)*
 
 **Acceptance criteria**
-- [ ] All three instances on the new build.
-- [ ] **Every today-or-later booking present in the pre-snapshot is present live after rollout**
-      (restored if it dropped). No current/future booking lost.
-- [ ] Live create + refresh persists; live failure shows a notice (no silent vanish).
-- [ ] Audit log shows reject/error events on failure paths in production.
+- [x] All three instances on the new build. *(All on `main` 153f390 via auto-deploy @ 14:06:59, all Ready.)*
+- [x] **Every today-or-later booking present in the pre-snapshot is present live after rollout**
+      (restored if it dropped). No current/future booking lost. *(Final diff: ALL PRESENT & UNCHANGED ×3.)*
+- [x] Live create + refresh persists; live failure shows a notice (no silent vanish).
+      *(insight: create survived refresh; stubbed failure → notice + rollback, no phantom.)*
+- [x] Audit log shows reject/error events on failure paths in production.
+      *(`reject_validation` events confirmed live on eclipse, bmo, and insight.)*
 
 **CPM:** no — this is deploy + ops, not a merge. (The merges happen in S1/S2/S3.)
 
@@ -497,3 +517,45 @@ data-loss path is closed in production.
   untouched.
 - **Unblocks:** S5 — S1, S2 and S3 (all of S5's code deps) are now merged to `main`. Still NOT live
   on `insight`; rollout + live verification is S5. Do not tell users it's fixed yet.
+
+### 2026-06-18 — S5 — production rollout + live verification (DONE; the fix is now LIVE on insight)
+- **Pre-snapshot (FIRST, READ-ONLY).** `scripts/snapshot-future.mjs` using the KV READ-ONLY token →
+  `.planning/S5-presnapshot-2026-06-18T04-16-48Z.json`. Today-or-later bookings: **insight** = 3
+  (Adam 12:00/1, Joel 13:00/3, Joel 16:00/1 — exactly the incident end-state); **eclipse** = 0;
+  **bmo** = 0. (Note: snapshot was taken ~11m AFTER the auto-deploys below; safe because a code
+  deploy provably does not touch KV, and the 3 insight rows match the known incident state — nothing
+  was lost. The snapshot served as the baseline to guard my own smoke-test writes.)
+- **Code-delivery mechanism (recorded).** The 3 instances are **separate Vercel projects, each
+  git-connected to `main` and auto-deploying on merge** (`booking-insight` / `booking-eclipse` /
+  `booking-bmo-financial-solutions`, each with a `…-git-main` alias). All three live production
+  aliases were created **14:06:59 AEST, 3 seconds after** the S3 merge `153f390` (14:06:56). So
+  **S1+S2+S3 auto-shipped to all three the moment the PRs merged last session** — no manual
+  `vercel redeploy` required, and the eclipse→bmo→insight canary is moot (one merge fans out to all
+  three at once). `vercel --prod` from this iCloud folder remains broken but was not needed.
+- **Data preservation.** Final read-only diff of live KV vs the pre-snapshot: **ALL PRESENT &
+  UNCHANGED on all three** instances. No today-or-later booking dropped; nothing to restore.
+- **S2 live (all three).** `POST {}` → HTTP 400 "Missing or invalid fields" on eclipse, bmo AND
+  insight, each followed by a fresh `reject_validation` audit event (verified by reading the audit
+  list HEAD — the log is **LPUSH/newest-first**; an early read of the tail caused a brief false
+  "insight isn't auditing" scare, fully explained). Pre-S2 code wrote nothing on rejects, so this
+  proves the new build is live and every failure is now traceable. No booking was created by these.
+- **S1 + S3 live on `insight` (browser, booking-insight.vercel.app):**
+  - *S3 alignment:* the TODAY view renders correctly — Adam 12-1PM past→hidden, Joel 1-4PM clipped to
+    "Joel (2-4 PM)" spanning its rows, Joel 4-5PM on its single row, available slots resume 5PM.
+  - *S1 create-persists-refresh (the core anti-vanish fix):* booked a far-future throwaway (Joel,
+    6-7AM, **Tue 30 Jun 2026** — empty day) → shown confirmed → **hard page reload** (wipes in-memory
+    optimistic state) → block **still present**. Then deleted it via the UI; KV `…:2026-06-30` is now
+    empty/`null`. No stray test data left.
+  - *S1 failure surfacing:* armed a one-shot `window.fetch` stub returning the exact S1 hole
+    (`200 {success:true}` with **no `booking`**) → attempted a 7-8AM book → UI showed a notice
+    ("…Please try again.") and the slot **rolled back** (no phantom block). `__stubFired === true`, so
+    no real POST hit the server (no phantom write either). Restored `fetch` afterwards.
+- **Net:** the data-loss path is closed in production — a save is shown as confirmed only after the
+  server persists it; an unconfirmed/failed save now surfaces a notice and rolls back instead of
+  vanishing on refresh; and every failure path leaves an audit event for instant diagnosis.
+- **CPM:** none (S5 is deploy + verify, not a merge — the merges were S1/S2/S3). `.planning/STATE.md`
+  left untouched (stale, unrelated). Helper scripts added: `scripts/snapshot-future.mjs`,
+  `scripts/audit-tail.mjs` (both read-only, uncommitted).
+- **Status:** **the booking-disappearance fix is LIVE and verified on `insight`** (and eclipse/bmo).
+  Remaining work is optional only: **S0** (pull runtime logs — diagnostic, may be expired) and **S4**
+  (atomic rate limiter — CPM: hold).
