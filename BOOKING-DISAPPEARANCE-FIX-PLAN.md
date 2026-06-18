@@ -108,7 +108,7 @@ Adam's remained. He re-booked and it stuck.
 | S1 | Client: confirm-before-commit + surface failures | P1 | ✅ | yes | — |
 | S2 | Server: audit every rejection/error path | P2 | ✅ | yes | — |
 | S3 | Render: fix booking-block misalignment | P4 | ✅ | yes | — |
-| S4 | Server: make the rate limiter atomic (stretch) | P5 | ⬜ | hold | S2 |
+| S4 | Server: make the rate limiter atomic (stretch) | P5 | 🔬 | hold (on branch, awaiting diff review) | S2 |
 | S5 | Production rollout + live verification across instances | P1 | ✅ | no (deploy) | S1, S2, S3 |
 
 > S0 is independent and **time-sensitive** (log retention is short). Do it first if possible,
@@ -335,18 +335,31 @@ with an atomic fixed-window counter (Redis `INCR` + `EXPIRE`, or a small Lua EVA
 requests from one IP can't lose increments and 429s are deterministic.
 
 **Tasks**
-- [ ] Implement atomic INCR/EXPIRE (or Lua) fixed-window limiter.
-- [ ] Preserve current limits/window; confirm `RATE_LIMIT` constants unchanged.
-- [ ] Ensure it composes with S2's 429 audit.
+- [x] Implement atomic INCR/EXPIRE (or Lua) fixed-window limiter.
+      *(Done: `RATE_LIMIT_LUA` in security.js — `INCR` then `PEXPIRE` (armed only when
+      count == 1) inside one `kv.eval`, matching the existing booking-scripts EVAL pattern.
+      Replaces the racy `kv.get` -> mutate -> `kv.set`.)*
+- [x] Preserve current limits/window; confirm `RATE_LIMIT` constants unchanged.
+      *(Constants untouched: 60 req / 60s. Window TTL is now `windowMs` (60s) instead of the
+      old 120s hack — the old long TTL only existed to detect a stale `windowStart`, which the
+      auto-expiring INCR window no longer needs. Limit/window behaviour unchanged.)*
+- [x] Ensure it composes with S2's 429 audit.
+      *(Unchanged: `checkRateLimit` still returns `{ allowed, remaining }`; the
+      `reject_ratelimit` logAudit path in `withSecurity` is untouched.)*
 
 **Acceptance criteria**
-- [ ] Concurrent burst from one IP is counted exactly; limit enforced deterministically.
-- [ ] No change to normal single-user behaviour.
+- [x] Concurrent burst from one IP is counted exactly; limit enforced deterministically.
+      *(100 concurrent EVALs against a throwaway key returned exactly {1..100}, no lost
+      increments; exactly 60 allowed / 40 rejected.)*
+- [x] No change to normal single-user behaviour.
+      *(Sequential calls on a fresh key return 1, 2 (allowed); TTL armed <= 60s.)*
 
-**Verification:** Local concurrency test against the limiter.
+**Verification:** Local concurrency test against live Upstash KV via
+`scripts/ratelimit-concurrency-test.mjs` (gitignored, throwaway `ratelimit:__s4test__*` keys
+only — no booking keys). All 5 checks PASSED on 2026-06-18.
 
-**CPM:** hold — commit on branch, review diff together before merge (touches a shared security
-path used by all instances).
+**CPM:** hold — committed on branch `fix/atomic-rate-limiter`. **Diff review pending before
+merge** (touches a shared security path used by all instances).
 
 ---
 

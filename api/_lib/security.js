@@ -59,8 +59,22 @@ function handleCors(req, res) {
   return true;
 }
 
+// Atomic fixed-window rate limiter. INCR + PEXPIRE inside one EVAL so concurrent
+// requests from the same IP can't lose increments (the old kv.get -> mutate ->
+// kv.set was a read-modify-write race) and the 429 cutoff is deterministic.
+// The window TTL is set only on the first request of a window (count == 1), so
+// the key auto-expires after windowMs and the next request starts a fresh window.
+// Returns the new count (an integer; INCR is RESP-safe, unlike float returns).
+const RATE_LIMIT_LUA = `
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+  redis.call('PEXPIRE', KEYS[1], ARGV[1])
+end
+return count
+`;
+
 /**
- * Simple rate limiting using KV
+ * Atomic fixed-window rate limiting using KV (Redis INCR + PEXPIRE via EVAL)
  * Returns { allowed: boolean, remaining: number }
  */
 async function checkRateLimit(req) {
@@ -71,26 +85,14 @@ async function checkRateLimit(req) {
                      'unknown';
 
     const key = `ratelimit:${clientIp}`;
-    const now = Date.now();
-    const windowStart = now - RATE_LIMIT.windowMs;
 
-    // Get current request count
-    let data = await kv.get(key);
+    // Atomically bump the window counter and (on the first hit) arm its expiry.
+    const count = await kv.eval(RATE_LIMIT_LUA, [key], [String(RATE_LIMIT.windowMs)]);
 
-    if (!data || data.windowStart < windowStart) {
-      // New window
-      data = { count: 1, windowStart: now };
-    } else {
-      data.count++;
-    }
-
-    // Save with TTL
-    await kv.set(key, data, { ex: 120 }); // 2 minute expiry
-
-    const remaining = Math.max(0, RATE_LIMIT.maxRequests - data.count);
+    const remaining = Math.max(0, RATE_LIMIT.maxRequests - count);
 
     return {
-      allowed: data.count <= RATE_LIMIT.maxRequests,
+      allowed: count <= RATE_LIMIT.maxRequests,
       remaining,
     };
   } catch (error) {
@@ -206,4 +208,4 @@ export function withSecurity(handler, options = {}) {
   };
 }
 
-export { sanitizeBookingInput, sanitizeString, isWithinBookableWindow };
+export { sanitizeBookingInput, sanitizeString, isWithinBookableWindow, RATE_LIMIT, RATE_LIMIT_LUA };
