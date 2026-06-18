@@ -4,6 +4,15 @@
   left: 0;
   right: 0;
   bottom: 0;
+  /* Mirror the slots-container grid: rows of --slot-height separated by
+     --slot-gap, packed from the top. Because the row geometry is identical to
+     the slot column, a block placed with `grid-row: start / span duration`
+     lands exactly on its hour rows - no pixel math, no font-swap drift. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: var(--slot-height);
+  gap: var(--slot-gap);
+  align-content: start;
   pointer-events: none;
 }
 

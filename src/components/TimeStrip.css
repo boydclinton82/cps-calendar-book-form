@@ -20,7 +20,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--slot-gap);
 }
 
 @media (max-width: 600px) {

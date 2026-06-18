@@ -1,4 +1,4 @@
-import { generateTimeSlots, formatDate, isToday, isSlotPast } from '../utils/time';
+import { generateTimeSlots, formatDate, isToday, isSlotPast, END_HOUR } from '../utils/time';
 import { TimeSlot } from './TimeSlot';
 import { BookingOverlay } from './BookingOverlay';
 import './TimeStrip.css';
@@ -25,6 +25,11 @@ export function TimeStrip({
   const visibleSlots = isToday(date)
     ? TIME_SLOTS.filter(slot => !isSlotPast(date, slot.hour))
     : TIME_SLOTS;
+
+  // The first visible hour is computed ONCE here and passed into the overlay so
+  // booking blocks clip and position against exactly the same boundary the slot
+  // rows use. If every slot is past (empty), END_HOUR makes all blocks clip out.
+  const firstVisibleHour = visibleSlots.length > 0 ? visibleSlots[0].hour : END_HOUR;
 
   const handleOverlayCancel = (timeKey) => {
     onSlotCancel?.(dateKey, timeKey);
@@ -61,6 +66,7 @@ export function TimeStrip({
         <BookingOverlay
           dayBookings={dayBookings}
           date={date}
+          firstVisibleHour={firstVisibleHour}
           currentUser={currentUser}
           onCancel={handleOverlayCancel}
           onBookingClick={handleBookingClick}

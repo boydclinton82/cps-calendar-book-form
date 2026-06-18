@@ -1,10 +1,6 @@
-import { isSlotPast, START_HOUR, isNSWInDST } from '../utils/time';
+import { isNSWInDST } from '../utils/time';
 import { getUserColorClass } from '../utils/colors';
 import './BookingBlock.css';
-
-// Layout constants for Day View - must match TimeStrip/TimeSlot CSS
-const SLOT_HEIGHT = 36;  // Approximate height of a TimeSlot
-const SLOT_GAP = 6;      // Gap from TimeStrip.css
 
 // Format hour to short time string (e.g., 17 -> "5 PM", 9 -> "9 AM", 12 -> "12 PM")
 function formatShortHour(hour, useNSWTime = false) {
@@ -45,6 +41,7 @@ export function BookingBlock({
   booking,
   startHour,
   date,
+  firstVisibleHour,  // First hour rendered by TimeStrip (single source of truth)
   currentUser,
   onCancel,
   onClick,
@@ -52,64 +49,31 @@ export function BookingBlock({
   useNSWTime = false,
 }) {
   const { user, duration } = booking;
-  const isOwn = user === currentUser;
 
-  // Calculate how many hours have passed for today
-  const now = new Date();
+  // Past dates render nothing. Today's past-slot clipping is NOT re-derived
+  // here: firstVisibleHour comes from TimeStrip, which already filters the
+  // visible slots, so the strip and the blocks can't disagree at an hour
+  // boundary. Any hour earlier than firstVisibleHour is a clipped (past) hour.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const bookingDate = new Date(date);
   bookingDate.setHours(0, 0, 0, 0);
-
-  let clipHours = 0;
-
   if (bookingDate < today) {
-    // Past date - entire booking is past
-    return null;
-  } else if (bookingDate.getTime() === today.getTime()) {
-    // Today - calculate how many hours are past using isSlotPast
-    for (let i = 0; i < duration; i++) {
-      if (isSlotPast(date, startHour + i)) {
-        clipHours++;
-      }
-    }
-    // If entire booking is past, don't render
-    if (clipHours >= duration) {
-      return null;
-    }
-  }
-
-  // Calculate position relative to visible slots
-  // For today, slots before current hour are filtered out in TimeStrip
-  const effectiveSlotHeight = SLOT_HEIGHT + SLOT_GAP;
-
-  // The slot index is relative to the first visible slot
-  // Must use isSlotPast for consistency with TimeStrip filtering
-  let firstVisibleHour = START_HOUR;
-  if (bookingDate.getTime() === today.getTime()) {
-    // Find first hour that isn't past - use isSlotPast for consistency
-    for (let h = START_HOUR; h < 24; h++) {
-      if (!isSlotPast(date, h)) {
-        firstVisibleHour = h;
-        break;
-      }
-    }
-  }
-
-  // Calculate the effective start position (accounting for clipped hours)
-  const effectiveStartHour = startHour + clipHours;
-  const slotIndex = effectiveStartHour - firstVisibleHour;
-
-  // If start is before first visible slot, this shouldn't happen with proper clipping
-  if (slotIndex < 0) {
     return null;
   }
 
+  const clipHours = Math.max(0, firstVisibleHour - startHour);
   const remainingDuration = duration - clipHours;
+  if (remainingDuration <= 0) {
+    // Entire booking is before the first visible row (fully past) - skip it.
+    return null;
+  }
 
-  // Calculate top position and height
-  const top = slotIndex * effectiveSlotHeight;
-  const height = remainingDuration * effectiveSlotHeight - SLOT_GAP;
+  // Place the block on the overlay grid by hour row. grid-row is 1-based, and
+  // the overlay shares the slot row geometry, so this lands exactly on the
+  // booking's hour rows with no pixel math.
+  const effectiveStartHour = startHour + clipHours;
+  const rowStart = effectiveStartHour - firstVisibleHour + 1;
 
   const handleClick = () => {
     if (onClick) {
@@ -128,7 +92,7 @@ export function BookingBlock({
   return (
     <div
       className={`booking-block ${userClass}`}
-      style={{ top: `${top}px`, height: `${height}px` }}
+      style={{ gridRow: `${rowStart} / span ${remainingDuration}` }}
       onClick={handleClick}
       role="button"
       tabIndex={0}

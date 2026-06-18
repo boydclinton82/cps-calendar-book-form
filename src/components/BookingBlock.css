@@ -1,7 +1,7 @@
 .booking-block {
-  position: absolute;
-  left: 0;
-  right: 0;
+  /* Positioned as a grid item in .booking-overlay via `grid-row` (see
+     BookingBlock.jsx); relative positioning anchors the cancel hint below. */
+  position: relative;
   border-radius: 10px;
   padding: 12px 20px;
   display: flex;

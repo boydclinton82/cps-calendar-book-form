@@ -4,6 +4,7 @@ import './BookingOverlay.css';
 export function BookingOverlay({
   dayBookings,
   date,
+  firstVisibleHour,  // First hour rendered by TimeStrip (single source of truth)
   currentUser,
   onCancel,
   onBookingClick,
@@ -27,6 +28,7 @@ export function BookingOverlay({
             booking={booking}
             startHour={startHour}
             date={date}
+            firstVisibleHour={firstVisibleHour}
             currentUser={currentUser}
             onCancel={() => onCancel?.(timeKey)}
             onClick={() => onBookingClick?.(timeKey, booking)}
