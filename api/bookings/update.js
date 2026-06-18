@@ -28,6 +28,7 @@ async function handler(req, res) {
 
       // Validate required fields
       if (!dateKey || !timeKey || !updates) {
+        await logAudit({ action: 'update', dateKey, timeKey, ip: getClientIp(req), result: 'reject_validation' });
         return res.status(400).json({
           error: 'Missing or invalid fields: dateKey, timeKey, updates'
         });
@@ -36,6 +37,7 @@ async function handler(req, res) {
       // If the duration is changing, the resulting booking must stay inside the
       // bookable window server-side (closes the cross-midnight hole for extends).
       if (updates.duration != null && !isWithinBookableWindow(timeKey, updates.duration)) {
+        await logAudit({ action: 'update', dateKey, timeKey, duration: updates.duration, ip: getClientIp(req), result: 'reject_window' });
         return res.status(400).json({ error: 'Outside bookable hours (06:00-22:00)' });
       }
 
@@ -49,7 +51,10 @@ async function handler(req, res) {
             updates.duration != null ? String(updates.duration) : '',
           ]
         );
-        if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
+        if (result === 'NOTFOUND') {
+          await logAudit({ action: 'update', dateKey, timeKey, ip: getClientIp(req), result: 'reject_notfound' });
+          return res.status(404).json({ error: 'Booking not found' });
+        }
         if (result === 'CONFLICT') {
           await logAudit({ action: 'conflict', dateKey, timeKey, ip: getClientIp(req), result: 'conflict' });
           return res.status(409).json({ error: 'Cannot extend: slot is already booked' });
@@ -71,7 +76,10 @@ async function handler(req, res) {
         ]
       );
 
-      if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
+      if (result === 'NOTFOUND') {
+        await logAudit({ action: 'update', dateKey, timeKey, ip: getClientIp(req), result: 'reject_notfound' });
+        return res.status(404).json({ error: 'Booking not found' });
+      }
       if (result === 'CONFLICT') {
         await logAudit({ action: 'conflict', dateKey, timeKey, ip: getClientIp(req), result: 'conflict' });
         return res.status(409).json({ error: 'Cannot extend: slot is already booked' });
@@ -90,6 +98,7 @@ async function handler(req, res) {
 
       // Validate required fields
       if (!dateKey || !timeKey) {
+        await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'reject_validation' });
         return res.status(400).json({
           error: 'Missing or invalid fields: dateKey, timeKey'
         });
@@ -97,14 +106,20 @@ async function handler(req, res) {
 
       if (PERDAY) {
         const result = await kv.eval(DELETE_BOOKING_DAY_LUA, [dayKey(slug, dateKey)], [timeKey]);
-        if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
+        if (result === 'NOTFOUND') {
+          await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'reject_notfound' });
+          return res.status(404).json({ error: 'Booking not found' });
+        }
         await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'ok' });
         return res.status(200).json({ success: true });
       }
 
       // Atomic delete inside one EVAL.
       const result = await kv.eval(DELETE_BOOKING_LUA, [key], [dateKey, timeKey]);
-      if (result === 'NOTFOUND') return res.status(404).json({ error: 'Booking not found' });
+      if (result === 'NOTFOUND') {
+        await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'reject_notfound' });
+        return res.status(404).json({ error: 'Booking not found' });
+      }
 
       await logAudit({ action: 'delete', dateKey, timeKey, ip: getClientIp(req), result: 'ok' });
       return res.status(200).json({ success: true });
@@ -115,6 +130,14 @@ async function handler(req, res) {
 
   } catch (error) {
     console.error('Error handling booking update:', error);
+    await logAudit({
+      action: req.method === 'DELETE' ? 'delete' : 'update',
+      dateKey: req.body?.dateKey,
+      timeKey: req.body?.timeKey,
+      ip: getClientIp(req),
+      result: 'error',
+      error: String(error?.message),
+    });
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

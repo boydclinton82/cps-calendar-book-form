@@ -106,7 +106,7 @@ Adam's remained. He re-booked and it stuck.
 |----|-------|----------|--------|-----|-----------|
 | S0 | Pull Vercel runtime logs for trigger evidence (time-sensitive) | P3 | ⬜ | no (read-only) | — |
 | S1 | Client: confirm-before-commit + surface failures | P1 | ✅ | yes | — |
-| S2 | Server: audit every rejection/error path | P2 | ⬜ | yes | — |
+| S2 | Server: audit every rejection/error path | P2 | ✅ | yes | — |
 | S3 | Render: fix booking-block misalignment | P4 | ⬜ | yes | — |
 | S4 | Server: make the rate limiter atomic (stretch) | P5 | ⬜ | hold | S2 |
 | S5 | Production rollout + live verification across instances | P1 | ⬜ | no (deploy) | S1, S2, S3 |
@@ -230,23 +230,28 @@ is the single highest-value addition.
 `api/_lib/audit.js` (reuse `logAudit`).
 
 **Tasks**
-- [ ] index.js: add `logAudit` before each early return — `result:'reject_validation'` (40-44),
+- [x] index.js: add `logAudit` before each early return — `result:'reject_validation'` (40-44),
       `result:'reject_window'` (48-50), `result:'reject_badtime'` (59-61).
-- [ ] index.js: add `logAudit({ action:'create', ..., result:'error', error:String(e?.message) })`
+- [x] index.js: add `logAudit({ action:'create', ..., result:'error', error:String(e?.message) })`
       in the 500 catch (77-80) before responding. (logAudit already never throws.)
-- [ ] update.js: mirror audit on its 400/404/500 branches.
-- [ ] security.js: audit the 429 rate-limit reject (186-190) as `result:'reject_ratelimit'`
-      (import `logAudit`/`getClientIp`, or surface a flag the handler audits).
-- [ ] Keep events shape-compatible with the existing reader (`{ ts, action, dateKey, timeKey,
+      *(action derived from method: POST→create else read; dateKey/timeKey pulled from req.body
+      since the POST-scoped consts are out of scope in the catch.)*
+- [x] update.js: mirror audit on its 400/404/500 branches.
+      *(PUT + DELETE each: 400 reject_validation, 400 reject_window (PUT only), 404 reject_notfound,
+      500 error. Caught a gap on first pass — DELETE-validation had no audit; fixed and re-verified.)*
+- [x] security.js: audit the 429 rate-limit reject (186-190) as `result:'reject_ratelimit'`
+      *(imported `logAudit`/`getClientIp` from `./audit.js`; action via a METHOD_ACTION map.)*
+- [x] Keep events shape-compatible with the existing reader (`{ ts, action, dateKey, timeKey,
       user?, duration?, ip?, result }`). Confirm `AUDIT_CAP` (1000) is still sane.
-- [ ] Add a tiny read affordance for ops (decide: protected `GET /api/bookings/audit` behind the
-      admin password, OR keep direct-KV-only). Default: keep direct-KV-only to avoid exposing
-      metadata/IPs publicly — note the decision in Progress Log.
+      *(Shape unchanged; `error` is an extra optional field only on the 500 path. AUDIT_CAP 1000 kept.)*
+- [x] Add a tiny read affordance for ops (decide: protected `GET /api/bookings/audit` behind the
+      admin password, OR keep direct-KV-only). **Decision: keep direct-KV-only** (no public endpoint)
+      to avoid exposing audit metadata/IPs publicly — see Progress Log.
 
 **Acceptance criteria**
-- [ ] Locally, each failure path produces exactly one audit event with the right `result`.
-- [ ] Success and conflict events unchanged.
-- [ ] No failure path can throw out of `logAudit` into the request path.
+- [x] Locally, each failure path produces exactly one audit event with the right `result`.
+- [x] Success and conflict events unchanged.
+- [x] No failure path can throw out of `logAudit` into the request path.
 
 **Verification:** `vercel dev` + curl each branch (bad payload, out-of-window, conflict, force an
 error), then read the local audit list and confirm the events. Show the event dump.
@@ -401,3 +406,29 @@ data-loss path is closed in production.
   untouched. (PR + merge recorded below once green.)
 - **Not done / still open:** S0, S2, S3, S4, and S5 rollout. Code is merged to `main` but NOT live
   on `insight` — production rollout is S5. Do not tell users it's fixed yet.
+
+### 2026-06-18 — S2 — audit every rejection/error path (DONE, CPM done)
+- **Decision (read-affordance task):** keep audit **direct-KV-only** — no public `GET /api/bookings/audit`.
+  Avoids exposing audit metadata/IPs publicly; ops read the list straight from KV as before.
+- **Code changed (server observability only; writes audit events, never booking data — guardrail-safe):**
+  - `api/bookings/index.js`: `logAudit` before the three POST early returns (`reject_validation`,
+    `reject_window`, `reject_badtime`) and in the 500 catch (`result:'error'`, `error:String(...)`,
+    action POST→create else read, dateKey/timeKey from `req.body` since the consts are out of catch scope).
+  - `api/bookings/update.js`: audit on every PUT and DELETE failure branch — `reject_validation`
+    (both), `reject_window` (PUT), `reject_notfound` (both, legacy + per-day), and `error` in the
+    500 catch. (First pass missed DELETE-validation; added and re-verified.)
+  - `api/_lib/security.js`: imported `logAudit`/`getClientIp` from `./audit.js`; the 429 branch now
+    logs `reject_ratelimit` with a METHOD_ACTION map (POST→create/PUT→update/DELETE→delete/GET→read).
+  - `api/_lib/audit.js`: unchanged. Event shape `{ ts, action, dateKey, timeKey, user?, duration?,
+    ip?, result }` preserved (`error` is an extra optional field on the 500 path only). AUDIT_CAP 1000 kept.
+- **Verification (no network, no KV writes):** isolated Node script stubbed `@vercel/kv` via
+  `node --experimental-test-module-mocks` and drove all 16 write-path outcomes through the REAL
+  handlers, capturing `logAudit` emissions. Result — every failure path emits exactly ONE audit
+  event with the correct `result` (reject_validation/reject_window/reject_badtime/reject_notfound/
+  reject_ratelimit/error), success (`ok`) and conflict (`conflict`) unchanged, and no path throws out
+  of `logAudit` (it wraps in try/catch). `node --check` clean on all four files. Temp script removed.
+  Did NOT run `vercel dev` (it uses production KV creds; the stub gives full branch coverage without
+  touching live data).
+- **CPM:** branch `feat/audit-all-write-paths`, scoped to S2 only, `.planning/STATE.md` left untouched.
+- **Unblocks:** S4 (atomic rate limiter) can now compose with the 429 audit. Still NOT live on
+  `insight` — rollout is S5.
