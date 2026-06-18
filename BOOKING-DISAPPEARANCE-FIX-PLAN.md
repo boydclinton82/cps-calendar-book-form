@@ -19,6 +19,33 @@
    slice says to.
 7. **Production rollout is separate from CPM.** Merging to `main` does NOT put code on the
    live `insight` instance. See **Rollout & deploy notes** before touching production.
+8. **Data-preservation guardrail (non-negotiable, every slice).** See the dedicated section
+   below. No slice may leave any instance missing a TODAY-or-later booking it had before the
+   work started. Past-time bookings do not matter; today's and future ones must survive.
+
+---
+
+## Data-preservation guardrail (read before any slice that can touch production)
+
+**Rule:** Across this entire body of work, no booking dated **today or later** may be lost from
+any live instance (insight, eclipse, bmo-financial-solutions). Bookings whose time has already
+passed do not matter. If anything drops a current/future booking, it must be **put back** —
+re-creating/overwriting the slot with the captured value is fine; no elaborate cutover required.
+
+**Why this is mostly about S5, not the code slices:**
+- Bookings persist in **Vercel KV**, which is independent of the application code. Merging to
+  `main` and redeploying code does **not** clear KV. So S1/S2/S3 (code-only, run against local
+  `vercel dev`) cannot by themselves remove production bookings.
+- The exposure is concentrated in **S5 (rollout)** and any storage-format/migration step, plus
+  the live disappearance bug itself continuing to drop bookings until the fix ships.
+
+**Mechanism (the only way "they go back in" is to have saved them):**
+1. **Snapshot first.** Before any production-touching step, capture today's+future bookings from
+   each instance (read-only KV read of the per-day hashes / blob). Save the dump in the session.
+2. **Verify after.** After each deploy/migration, re-read and diff. Any current/future slot that
+   the pre-snapshot had but the live state lacks must be re-added (replace the slot with the
+   saved value).
+3. Never delete/overwrite a slot that wasn't in the pre-snapshot. Only restore, never prune.
 
 ### Status legend
 - ⬜ Not started
@@ -78,7 +105,7 @@ Adam's remained. He re-booked and it stuck.
 | ID | Slice | Priority | Status | CPM | Depends on |
 |----|-------|----------|--------|-----|-----------|
 | S0 | Pull Vercel runtime logs for trigger evidence (time-sensitive) | P3 | ⬜ | no (read-only) | — |
-| S1 | Client: confirm-before-commit + surface failures | P1 | ⬜ | yes | — |
+| S1 | Client: confirm-before-commit + surface failures | P1 | ✅ | yes | — |
 | S2 | Server: audit every rejection/error path | P2 | ⬜ | yes | — |
 | S3 | Render: fix booking-block misalignment | P4 | ⬜ | yes | — |
 | S4 | Server: make the rate limiter atomic (stretch) | P5 | ⬜ | hold | S2 |
@@ -125,34 +152,67 @@ vanishing on the next poll/refresh.
 **Files:** `src/hooks/useBookings.js` (primary), `src/services/api.js` (supporting).
 
 **Tasks**
-- [ ] In `createBooking` (useBookings.js ~129-138): add the missing `else` — a resolved response
+- [x] In `createBooking` (useBookings.js ~129-138): add the missing `else` — a resolved response
       with no usable `booking` must be treated as a FAILURE (throw or route into the existing
       catch) so it rolls back the slot and calls `setNotice(...)`. No silent success.
-- [ ] Stop clearing `pendingRef` in `finally` (line 155). Only remove a pending key once the
+      *(Done: `if (!b) throw` routes into the existing catch → rollback + `setNotice`. Mirrored in
+      `updateBooking`.)*
+- [x] Stop clearing `pendingRef` in `finally` (line 155). Only remove a pending key once the
       booking is confirmed present in a SERVER snapshot (success path after reconcile) or after
       a rollback (catch path). Mirror the same correction in `removeBooking` (192) and
       `updateBooking` (243).
-- [ ] Decide and implement the cross-refresh durability stance: at minimum, ensure an in-flight
+      *(Done: all three `finally` blocks removed; pending keys now retired in
+      `handlePollingUpdate` when a server snapshot confirms the op, or in the catch on rollback.
+      The snapshot-confirmation logic is extracted to a pure `reconcileSnapshot` helper.)*
+- [x] Decide and implement the cross-refresh durability stance: at minimum, ensure an in-flight
       create that gets interrupted cannot leave a "looks booked" state with no confirmation.
-      (Optionally persist pending ops so a reload can re-verify; keep it simple — surfacing the
-      failure is the must-have.)
-- [ ] Review `fetchBookings` localStorage fallback (api.js:86-89): ensure a failed GET does not
+      *(Stance chosen: optimistic state + pending map are in-memory ONLY, never persisted. A
+      mid-flight refresh wipes them, so on reload the server snapshot is authoritative — a
+      not-yet-persisted create simply isn't shown (no phantom); a persisted one shows. Simple,
+      and the must-have failure surfacing is covered by the confirm-before-commit throw.)*
+- [x] Review `fetchBookings` localStorage fallback (api.js:86-89): ensure a failed GET does not
       masquerade as authoritative server data in a way that hides a missing booking. At least
       log/flag the fallback so it's observable.
-- [ ] Add/adjust tests if a test harness exists (check `package.json`); otherwise document manual
+      *(Done: in API mode a failed GET now `console.error`s and re-throws instead of returning
+      empty/stale localStorage. The poller skips null/error results (keeps last good state) and
+      the mount effect sets `error`; a failed GET can no longer present as an empty authoritative
+      snapshot that wipes the view or hides a booking.)*
+- [x] Add/adjust tests if a test harness exists (check `package.json`); otherwise document manual
       test steps.
+      *(No test harness in `package.json`. Added `src/hooks/reconcile.test.js` runnable via the
+      Node built-in runner — `node --test src/hooks/reconcile.test.js` (9 tests, all pass) — no
+      new deps. Manual `vercel dev` / mock-API steps documented under Verification below.)*
 
-**Acceptance criteria**
-- [ ] Simulated failed/empty create response → slot rolls back AND a notice appears (no silent
-      retain).
-- [ ] A successful create stays put across the next poll and a manual refresh.
-- [ ] No regression to the existing 409-conflict toast behaviour.
+**Acceptance criteria** *(✅ = logic-verified via build + unit tests + code review this session;
+live UI confirmation deferred to S5, which verifies these same paths live anyway — see Progress Log)*
+- [x] Simulated failed/empty create response → slot rolls back AND a notice appears (no silent
+      retain). *(Code: `if (!b) throw` → catch rollback + `setNotice`. Live click-through at S5.)*
+- [x] A successful create stays put across the next poll and a manual refresh. *(Unit-tested:
+      snapshot containing the booking retires the pending key and renders it; unconfirmed stays
+      re-applied. Live refresh at S5.)*
+- [x] No regression to the existing 409-conflict toast behaviour. *(Unchanged path: a 409 still
+      rejects in `apiRequest` → existing catch → `noticeForError` "just booked" message. Live at S5.)*
 - [ ] Booking the same slot Joel did (1-4PM + 4-5PM with another user already on 12-1PM) behaves
-      correctly locally against `vercel dev`.
+      correctly locally against `vercel dev`. *(Deferred to S5 live verification to avoid running
+      create/delete against production KV; the multi-slot/other-user merge is unit-tested in
+      `reconcile.test.js`.)*
 
 **Verification:** Run locally against `vercel dev` (per repo convention; `/run` skill or
 `vite` + functions). Reproduce the empty/failed-response case by stubbing the API response.
 State exactly what was observed.
+
+> **Safety note (per Data-preservation guardrail):** `vercel dev` here uses the SHARED PRODUCTION
+> KV creds in `.env.local`, so creating/deleting bookings through it touches live data. For a
+> safe e2e, point `/api` at a throwaway mock (a small local Node server returning canned
+> `{success, booking}` / `{success}` (no booking) / `409` responses) via a temporary Vite proxy,
+> with `VITE_USE_API=true`. Do NOT run create/delete e2e against the production KV.
+>
+> **What was actually verified this session (2026-06-18):** production build compiles clean after
+> all edits; `node --test src/hooks/reconcile.test.js` passes 9/9 against the real snapshot-merge
+> helper (covers the incident shape: a booking absent from the snapshot stays put and pending;
+> server-confirmed ops are retired; a pending delete is enforced until the server confirms
+> absence; other users' bookings preserved). **Not yet run:** the live mock-API UI walkthrough
+> (empty-response rollback+notice, success-survives-refresh, 409 toast as observed clicks).
 
 **CPM:** yes, after acceptance passes. Branch e.g. `fix/client-confirm-before-commit`.
 
@@ -264,11 +324,17 @@ path used by all instances).
 data-loss path is closed in production.
 
 **Tasks**
+- [ ] **Pre-snapshot (do FIRST, per the Data-preservation guardrail).** Read-only dump of every
+      TODAY-or-later booking from all three instances' KV. Save the dump in the session so any
+      dropped slot can be re-added afterwards. Past-time slots can be ignored.
 - [ ] Confirm HOW instances receive code: are the 3 instances (insight, eclipse,
       bmo-financial-solutions) separate Vercel projects auto-deploying from `main`, or do they
       need manual redeploy? (Last session used `vercel redeploy <id>` because `vercel --prod`
       fails from this iCloud folder.) Record the answer.
 - [ ] Roll out in canary order: **eclipse → bmo-financial-solutions → insight** (insight last).
+- [ ] **Post-deploy diff + restore.** After each instance redeploys, re-read its KV and diff
+      against the pre-snapshot. Re-add (overwrite the slot with the saved value) any today/future
+      booking that went missing. Never prune a slot absent from the pre-snapshot.
 - [ ] After each: smoke test a far-future slot (create → refresh → still there; force a failure →
       notice shown, slot rolls back). Confirm via the audit log that events now cover failures.
 - [ ] Verify on `insight` specifically that a booking shown as saved survives refresh, and a
@@ -277,6 +343,8 @@ data-loss path is closed in production.
 
 **Acceptance criteria**
 - [ ] All three instances on the new build.
+- [ ] **Every today-or-later booking present in the pre-snapshot is present live after rollout**
+      (restored if it dropped). No current/future booking lost.
 - [ ] Live create + refresh persists; live failure shows a notice (no silent vanish).
 - [ ] Audit log shows reject/error events on failure paths in production.
 
@@ -307,3 +375,29 @@ data-loss path is closed in production.
 - Forensic investigation complete (read-only). Root causes identified and split into slices S0-S5.
 - No code changed yet. No production data touched.
 - Next: execute S0 (time-sensitive) and/or S1 in fresh sessions.
+
+### 2026-06-18 — S1 — confirm-before-commit + surface failures (DONE, CPM done)
+- **Added a Data-preservation guardrail** (new top section + S5 tasks/acceptance): no slice may
+  drop a today-or-later booking from any instance; restore-by-replace if it happens. Snapshot is
+  taken at S5 (first rollout task), not now, to avoid a stale snapshot. (User-requested addendum.)
+- **Code changed (client-only, no production data touched):**
+  - `src/hooks/useBookings.js`: `createBooking` now throws on a resolved-but-no-`booking` response
+    (the silent-success hole) → rollback + notice; mirrored in `updateBooking`. Removed all three
+    `finally { pendingRef.delete }` clears; pending keys are now retired only when a server
+    snapshot confirms the op (`handlePollingUpdate`) or on rollback (catch, before `triggerSync`).
+  - `src/hooks/reconcile.js` (new): pure `reconcileSnapshot()` — merges snapshot + in-flight ops
+    and reports which pending keys the server has confirmed. Single source of truth for the merge.
+  - `src/services/api.js`: in API mode a failed GET now `console.error`s and re-throws instead of
+    returning empty/stale localStorage, so it can't masquerade as an authoritative empty snapshot.
+  - Cross-refresh stance: optimistic state + pending map stay in-memory only (never persisted), so
+    a mid-flight refresh falls back to authoritative server truth — no phantom "looks booked".
+- **Verification:** `npm run build` clean (61 modules). `node --test src/hooks/reconcile.test.js`
+  → 9/9 pass (incident shape covered). No live `vercel dev` UI run: it uses production KV creds in
+  `.env.local`, so create/delete e2e there would touch live bookings (guardrail). Per operator
+  decision (PE-2), proceeding to CPM on build + unit tests + review; live click-through
+  (empty-response rollback+notice, success-survives-refresh, 409 toast, Joel's slots) is folded
+  into **S5** live verification.
+- **CPM:** branch `fix/client-confirm-before-commit`, scoped to S1 only, `.planning/STATE.md` left
+  untouched. (PR + merge recorded below once green.)
+- **Not done / still open:** S0, S2, S3, S4, and S5 rollout. Code is merged to `main` but NOT live
+  on `insight` — production rollout is S5. Do not tell users it's fixed yet.
