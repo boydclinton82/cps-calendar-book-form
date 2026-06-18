@@ -80,12 +80,18 @@ export async function fetchBookings(range) {
     return localStorage.getBookings();
   }
 
+  // In API mode the server is the source of truth; localStorage holds nothing
+  // authoritative here. A failed GET must NOT masquerade as an (empty/stale)
+  // authoritative snapshot: doing so would wipe everyone's bookings off-screen
+  // and could hide a booking that is actually still on the server. Surface the
+  // error instead so it is observable and callers keep their last good state
+  // (the poller skips a null/error result; the mount effect sets `error`).
+  const qs = range?.from && range?.to ? `?from=${range.from}&to=${range.to}` : '';
   try {
-    const qs = range?.from && range?.to ? `?from=${range.from}&to=${range.to}` : '';
     return await apiRequest(`/bookings${qs}`);
   } catch (error) {
-    console.warn('API unavailable, falling back to localStorage');
-    return localStorage.getBookings();
+    console.error('Failed to fetch bookings from API (keeping last known state, not falling back to localStorage):', error);
+    throw error;
   }
 }
 

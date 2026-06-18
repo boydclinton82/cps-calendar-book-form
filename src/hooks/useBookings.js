@@ -8,6 +8,7 @@ import {
   isApiEnabled,
 } from '../services/api';
 import { usePollingSync } from './usePollingSync';
+import { reconcileSnapshot } from './reconcile';
 
 // Polling interval in milliseconds
 const POLLING_INTERVAL = 7000;
@@ -54,23 +55,17 @@ export function useBookings({ currentDate, isWeekView } = {}) {
   // before the server confirms it.
   const handlePollingUpdate = useCallback((data) => {
     if (!data || typeof data !== 'object') return;
-    setBookings(() => {
-      const merged = {};
-      for (const date of Object.keys(data)) merged[date] = { ...data[date] };
-      for (const [pk, optimistic] of pendingRef.current.entries()) {
-        const [date, time] = pk.split('|');
-        if (optimistic === null) {
-          if (merged[date]) {
-            delete merged[date][time];
-            if (Object.keys(merged[date]).length === 0) delete merged[date];
-          }
-        } else {
-          if (!merged[date]) merged[date] = {};
-          merged[date][time] = optimistic;
-        }
-      }
-      return merged;
-    });
+    // Reconcile the snapshot against in-flight optimistic ops. Pending keys the
+    // server has now durably confirmed are retired here (this replaces the old
+    // "clear pendingRef in finally", which dropped keys before the server had
+    // persisted the write and let bookings vanish on the next poll). Still-
+    // unconfirmed ops stay re-applied so an in-flight booking is never wiped.
+    const { merged, confirmed } = reconcileSnapshot(
+      data,
+      [...pendingRef.current.entries()]
+    );
+    for (const pk of confirmed) pendingRef.current.delete(pk);
+    setBookings(() => merged);
   }, []);
 
   // Setup polling for real-time sync (only when API is enabled). The poller reads
@@ -127,15 +122,22 @@ export function useBookings({ currentDate, isWeekView } = {}) {
       const res = await apiCreateBooking({ dateKey: date, timeKey: time, user, duration });
       // Reconcile from the server response (write only { user, duration }).
       const b = res?.booking;
-      if (b) {
-        const reconciled = { user: b.user, duration: b.duration };
-        pendingRef.current.set(pk, reconciled);
-        setBookings((prev) => {
-          const newBookings = { ...prev };
-          newBookings[date] = { ...(newBookings[date] || {}), [time]: reconciled };
-          return newBookings;
-        });
+      // Confirm-before-commit: a resolved response with no usable booking means
+      // the server did NOT durably confirm the write. Treat it as a failure so
+      // the slot rolls back and the user is told, instead of leaving a phantom
+      // "looks booked" entry that silently vanishes on the next poll/refresh.
+      if (!b) {
+        throw new Error('Booking was not confirmed by the server.');
       }
+      const reconciled = { user: b.user, duration: b.duration };
+      // Keep the pending key in place: it is cleared only once a server SNAPSHOT
+      // contains this booking (handlePollingUpdate) or on rollback below.
+      pendingRef.current.set(pk, reconciled);
+      setBookings((prev) => {
+        const newBookings = { ...prev };
+        newBookings[date] = { ...(newBookings[date] || {}), [time]: reconciled };
+        return newBookings;
+      });
     } catch (err) {
       console.error('Failed to create booking:', err);
       setError(err.message);
@@ -149,10 +151,11 @@ export function useBookings({ currentDate, isWeekView } = {}) {
         }
         return newBookings;
       });
+      // Drop the pending key as part of the rollback, BEFORE triggerSync, so the
+      // incoming snapshot can't re-apply the failed optimistic write.
+      pendingRef.current.delete(pk);
       setNotice(noticeForError(err));
       triggerSync();
-    } finally {
-      pendingRef.current.delete(pk);
     }
   }, [triggerSync]);
 
@@ -175,6 +178,9 @@ export function useBookings({ currentDate, isWeekView } = {}) {
 
     try {
       await apiDeleteBooking({ dateKey: date, timeKey: time });
+      // Success: keep the pending delete (null) in place until a server SNAPSHOT
+      // shows the slot is actually gone (handlePollingUpdate clears it then), so
+      // the slot can't reappear before the delete is durably reflected.
     } catch (err) {
       console.error('Failed to delete booking:', err);
       setError(err.message);
@@ -186,10 +192,11 @@ export function useBookings({ currentDate, isWeekView } = {}) {
           return newBookings;
         });
       }
+      // Drop the pending key as part of the rollback, BEFORE triggerSync, so the
+      // incoming snapshot can't re-apply the failed optimistic delete.
+      pendingRef.current.delete(pk);
       setNotice(noticeForError(err));
       triggerSync();
-    } finally {
-      pendingRef.current.delete(pk);
     }
   }, [bookings, triggerSync]);
 
@@ -216,16 +223,21 @@ export function useBookings({ currentDate, isWeekView } = {}) {
       const res = await apiUpdateBooking({ dateKey: date, timeKey: time, updates });
       // PUT returns the full stored { user, duration } - write it directly.
       const b = res?.booking;
-      if (b) {
-        pendingRef.current.set(pk, b);
-        setBookings((prev) => {
-          const newBookings = { ...prev };
-          if (newBookings[date]) {
-            newBookings[date] = { ...newBookings[date], [time]: b };
-          }
-          return newBookings;
-        });
+      // Confirm-before-commit (mirror of createBooking): a resolved response with
+      // no usable booking is an unconfirmed write, so fail it rather than leaving
+      // an optimistic edit that can silently revert on the next poll.
+      if (!b) {
+        throw new Error('Update was not confirmed by the server.');
       }
+      // Keep the pending key until a server SNAPSHOT reflects this value.
+      pendingRef.current.set(pk, b);
+      setBookings((prev) => {
+        const newBookings = { ...prev };
+        if (newBookings[date]) {
+          newBookings[date] = { ...newBookings[date], [time]: b };
+        }
+        return newBookings;
+      });
     } catch (err) {
       console.error('Failed to update booking:', err);
       setError(err.message);
@@ -237,10 +249,10 @@ export function useBookings({ currentDate, isWeekView } = {}) {
           return newBookings;
         });
       }
+      // Drop the pending key as part of the rollback, BEFORE triggerSync.
+      pendingRef.current.delete(pk);
       setNotice(noticeForError(err));
       triggerSync();
-    } finally {
-      pendingRef.current.delete(pk);
     }
   }, [bookings, triggerSync]);
 
