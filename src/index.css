@@ -60,6 +60,13 @@
   /* Timing */
   --transition-fast: 150ms ease-out;
   --transition-medium: 300ms ease-out;
+
+  /* Day View slot geometry - single source of truth shared by the TimeSlot
+     height, the slots-container gap, and the BookingOverlay grid rows. Keeping
+     these in one place is what lets booking blocks align to their hour rows on
+     first paint regardless of web-font load timing (fixed px, not font-driven). */
+  --slot-height: 36px;
+  --slot-gap: 6px;
 }
 
 * {

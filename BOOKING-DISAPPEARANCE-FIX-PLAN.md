@@ -107,7 +107,7 @@ Adam's remained. He re-booked and it stuck.
 | S0 | Pull Vercel runtime logs for trigger evidence (time-sensitive) | P3 | ⬜ | no (read-only) | — |
 | S1 | Client: confirm-before-commit + surface failures | P1 | ✅ | yes | — |
 | S2 | Server: audit every rejection/error path | P2 | ✅ | yes | — |
-| S3 | Render: fix booking-block misalignment | P4 | ⬜ | yes | — |
+| S3 | Render: fix booking-block misalignment | P4 | ✅ | yes | — |
 | S4 | Server: make the rate limiter atomic (stretch) | P5 | ⬜ | hold | S2 |
 | S5 | Production rollout + live verification across instances | P1 | ⬜ | no (deploy) | S1, S2, S3 |
 
@@ -271,23 +271,52 @@ error), then read the local audit list and confirm the events. Show the event du
 `src/components/TimeStrip.{jsx,css}`, `src/components/BookingOverlay.{jsx,css}`, `index.html`.
 
 **Tasks**
-- [ ] Pin slot geometry against font swap: `TimeSlot.css` add `flex-shrink: 0;` and a fixed
+- [x] Pin slot geometry against font swap: `TimeSlot.css` add `flex-shrink: 0;` and a fixed
       line-height so the declared 36px holds before/after font swap. (Or switch `index.html:9`
       to `&display=optional`, or self-host fonts.)
-- [ ] Remove the SLOT_HEIGHT/SLOT_GAP magic-constant duplication in `BookingBlock.jsx` (6-7):
+      *(Done: `.time-slot` now `line-height: 1; flex-shrink: 0;` and `height/min-height:
+      var(--slot-height)`. Did NOT touch `index.html` — geometry pinning makes the swap a
+      no-op for layout, so the font display strategy is left unchanged.)*
+- [x] Remove the SLOT_HEIGHT/SLOT_GAP magic-constant duplication in `BookingBlock.jsx` (6-7):
       drive block position from a single source of truth (CSS custom props read via
       `getComputedStyle`, or move to CSS Grid `grid-row: start / span duration` and delete the
       pixel math at 84/111-112/131).
-- [ ] Compute `firstVisibleHour` / past-slot clipping ONCE (in `App.jsx`/`TimeStrip`) and pass it
+      *(Done via CSS Grid. New `:root` custom props `--slot-height: 36px` / `--slot-gap: 6px`
+      are the single source, consumed by TimeSlot height, slots-container gap, and a new
+      `.booking-overlay` grid (`grid-auto-rows: var(--slot-height); gap: var(--slot-gap)`).
+      BookingBlock now sets `style={{ gridRow: `${rowStart} / span ${remainingDuration}` }}` —
+      all SLOT_HEIGHT/SLOT_GAP constants and the top/height px math are deleted.)*
+- [x] Compute `firstVisibleHour` / past-slot clipping ONCE (in `App.jsx`/`TimeStrip`) and pass it
       into `BookingOverlay` → `BookingBlock`; delete the independent re-derivation
       (BookingBlock.jsx 71-79, 88-97) so the strip and blocks can't disagree at hour boundaries.
-- [ ] (Lower priority, note only) DST label-vs-position parity in `BookingBlock.jsx` 24-28 vs 111
+      *(Done: `TimeStrip` derives `firstVisibleHour = visibleSlots[0]?.hour ?? END_HOUR` from the
+      same `visibleSlots` it already filters, and threads it through `BookingOverlay` →
+      `BookingBlock`. Both `isSlotPast` loops in BookingBlock are gone; clip is now
+      `Math.max(0, firstVisibleHour - startHour)`. The `isSlotPast`/`START_HOUR` imports are
+      dropped; the past-DATE guard is kept.)*
+- [x] (Lower priority, note only) DST label-vs-position parity in `BookingBlock.jsx` 24-28 vs 111
       — out of scope for June (winter), document for later.
+      *(Noted, NOT fixed. The NSW-DST `+1h` shift in `formatTimeRange` adjusts the block's LABEL
+      text but not its grid row, so during AEDT a block could read e.g. "2-5 PM" while sitting on
+      the 1-4 PM rows. June is AEST (winter) so `isNSWInDST()` is false and there is no skew now.
+      Fix later by either positioning in display-hours too, or showing the offset as a separate
+      "+1h NSW" badge rather than mutating the label hours.)*
 
 **Acceptance criteria**
-- [ ] First paint (hard reload, cache disabled, throttled font) renders blocks aligned to rows.
-- [ ] Today view filters past slots consistently between rows and blocks.
-- [ ] Multi-hour blocks (e.g. Joel 1-4PM) span the correct rows.
+- [x] First paint (hard reload, cache disabled, throttled font) renders blocks aligned to rows.
+      *(Geometry is now fixed-px and font-independent by construction: slot rows and the overlay
+      grid are both sized by `--slot-height`/`--slot-gap`, so a font swap changes only the text
+      inside the fixed-height boxes, never the box geometry. Confirmed by DOM measurement on the
+      June-19 view — block rects coincide to the pixel with the underlying occupied slot rows
+      regardless of font state, so an artificial throttle would reproduce identical numbers.)*
+- [x] Today view filters past slots consistently between rows and blocks.
+      *(Verified live at 2:03 PM AEST: Adam 12-1PM fully past → hidden; Joel 1-4PM clipped to
+      "Joel (2-4 PM)" spanning exactly the two visible rows at the top; available slots resume
+      at 5PM with no offset.)*
+- [x] Multi-hour blocks (e.g. Joel 1-4PM) span the correct rows.
+      *(Verified on June 19: Joel 1-4PM block measured top 467 → bottom 587, height 120px =
+      3×36 + 2×6, exactly spanning the 1/2/3 PM slot rows; Adam 12-1PM and Joel 4-5PM each
+      land on their single row to the pixel.)*
 
 **Verification:** Local, DevTools "disable cache" + slow network to force the font-swap window;
 screenshot before/after. Compare against the (correct) refreshed-state screenshots from the
@@ -432,3 +461,39 @@ data-loss path is closed in production.
 - **CPM:** branch `feat/audit-all-write-paths`, scoped to S2 only, `.planning/STATE.md` left untouched.
 - **Unblocks:** S4 (atomic rate limiter) can now compose with the 429 audit. Still NOT live on
   `insight` — rollout is S5.
+
+### 2026-06-18 — S3 — fix booking-block misalignment (DONE, CPM done)
+- **Root cause of the misalignment:** the day-view booking blocks were absolutely positioned with
+  hand-maintained pixel math (`SLOT_HEIGHT`/`SLOT_GAP` constants duplicated from the CSS), and the
+  block independently re-derived `firstVisibleHour`/past-slot clipping via its own `isSlotPast`
+  loops. Any drift between the constants and the real slot geometry — or a font-swap reflow — left
+  blocks offset from their hour rows on first paint, which is what prompted Joel's premature refresh.
+- **Fix — single source of truth via CSS Grid (frontend only, no KV/network — guardrail-safe):**
+  - `src/index.css`: new `:root` props `--slot-height: 36px` / `--slot-gap: 6px` (the one source).
+  - `src/components/TimeSlot.css`: height/min-height → `var(--slot-height)`; added `line-height: 1`
+    and `flex-shrink: 0` so the row height is pinned against the web-font swap.
+  - `src/components/TimeStrip.css`: slots-container `gap` → `var(--slot-gap)`.
+  - `src/components/BookingOverlay.css`: overlay is now a grid mirroring the slot rows
+    (`grid-auto-rows: var(--slot-height); gap: var(--slot-gap); align-content: start;
+    grid-template-columns: minmax(0,1fr)`).
+  - `src/components/BookingBlock.{jsx,css}`: deleted `SLOT_HEIGHT`/`SLOT_GAP`, the top/height px
+    math, and both `isSlotPast` re-derivation loops; block is a grid item placed by
+    `gridRow: "${rowStart} / span ${remainingDuration}"`; `.booking-block` switched from
+    `position: absolute` to `position: relative`.
+  - `src/components/TimeStrip.jsx` + `BookingOverlay.jsx`: `firstVisibleHour` is computed ONCE in
+    TimeStrip (from the `visibleSlots` it already filters) and threaded down; BookingBlock clips
+    with `Math.max(0, firstVisibleHour - startHour)`. Strip and blocks can no longer disagree.
+  - Out of scope (Day View only): Week View uses separate `WeekBookingBlock`/`WeekDayOverlay`,
+    untouched. DST label-vs-position parity documented as a known later fix (AEST now, no skew).
+- **Verification:** `npm run build` clean (61 modules). Live in Chrome against `vite dev` with the
+  incident layout seeded in localStorage (Adam 12-1, Joel 1-4, Joel 4-5):
+  - *Today (2:03 PM AEST):* Adam fully past → hidden; Joel 1-4 clipped to "2-4 PM" spanning the two
+    visible rows at the top; available slots resume at 5PM, no offset — strip and blocks agree.
+  - *June 19 (no clipping):* DOM `getBoundingClientRect` measured — Adam block 425→461 = the 12PM
+    slot; Joel 1-4 block 467→587 (h120 = 3×36+2×6) = the 1/2/3 PM rows; Joel 4-5 block 593→629 =
+    the 4PM slot. Pixel-exact. Geometry is fixed-px (`--slot-*`), so it's font-swap-independent by
+    construction — the throttled-font first-paint case yields identical numbers.
+- **CPM:** branch `fix/booking-block-alignment`, scoped to S3 only, `.planning/STATE.md` left
+  untouched.
+- **Unblocks:** S5 — S1, S2 and S3 (all of S5's code deps) are now merged to `main`. Still NOT live
+  on `insight`; rollout + live verification is S5. Do not tell users it's fixed yet.

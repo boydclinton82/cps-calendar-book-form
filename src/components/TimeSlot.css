@@ -3,8 +3,13 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 36px;
-  min-height: 36px;
+  height: var(--slot-height);
+  min-height: var(--slot-height);
+  /* Pin the row height against the web-font swap: a fixed line-height plus
+     flex-shrink:0 means the declared slot height holds before and after the
+     font loads, so booking blocks stay aligned to their rows on first paint. */
+  line-height: 1;
+  flex-shrink: 0;
   padding: 0 20px;
   background: rgba(15, 25, 45, 0.5);
   border: 1px solid rgba(0, 229, 229, 0.2);
