@@ -294,13 +294,16 @@ error), then read the local audit list and confirm the events. Show the event du
       `BookingBlock`. Both `isSlotPast` loops in BookingBlock are gone; clip is now
       `Math.max(0, firstVisibleHour - startHour)`. The `isSlotPast`/`START_HOUR` imports are
       dropped; the past-DATE guard is kept.)*
-- [x] (Lower priority, note only) DST label-vs-position parity in `BookingBlock.jsx` 24-28 vs 111
-      — out of scope for June (winter), document for later.
-      *(Noted, NOT fixed. The NSW-DST `+1h` shift in `formatTimeRange` adjusts the block's LABEL
-      text but not its grid row, so during AEDT a block could read e.g. "2-5 PM" while sitting on
-      the 1-4 PM rows. June is AEST (winter) so `isNSWInDST()` is false and there is no skew now.
-      Fix later by either positioning in display-hours too, or showing the offset as a separate
-      "+1h NSW" badge rather than mutating the label hours.)*
+- [x] (Investigated 2026-06-19) DST label-vs-position parity in `BookingBlock.jsx` —
+      **RE-EXAMINED AND DISMISSED: this is NOT a bug.** The earlier note assumed the NSW-DST
+      `+1h` shift mutates the booking block's LABEL but not the rows it sits on. That assumption
+      is wrong: `TimeSlot.jsx:17` labels every row with `formatHour(hour, useNSWTime)`, so during
+      AEDT the row labels shift `+1h` right alongside the block label. Both the row-at-a-position
+      and the block-at-that-position derive their label from the same QLD hour with the same
+      offset, so they stay aligned (e.g. a QLD 1pm booking reads "2-5 PM" and sits on rows
+      labelled "2:00 PM / 3:00 PM / 4:00 PM"). The grid ROW position is intentionally QLD-hour
+      based and never needs DST adjustment. No code change required. Do not re-open without first
+      re-reading `TimeSlot.jsx:17` and `BookingBlock.jsx`'s `formatTimeRange` together.
 
 **Acceptance criteria**
 - [x] First paint (hard reload, cache disabled, throttled font) renders blocks aligned to rows.

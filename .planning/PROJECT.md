@@ -60,6 +60,7 @@ Users can quickly see availability and book time slots without conflicts.
 |----------|-----------|---------|
 | Store times in QLD timezone | Queensland has no DST, simpler storage | ✓ Good |
 | Display-only timezone toggle | Avoids storage complexity, users convert mentally today | ✓ Good |
+| Date keys = LOCAL calendar date (`getFullYear/Month/Date`), not UTC | `toISOString()` returns UTC, which lags the local date by a day for the first 10h of each Brisbane day (UTC+10). That shifted every booking +1 day in the morning. Fixed 2026-06-19, see `DATE-KEY-TIMEZONE-FIX.md` | ✓ Fixed |
 | Blueprint spec depth | AI consumer requires exhaustive detail for "perfect" recreation | ✓ Good |
 | Live + code approach | Screenshots capture visual truth; code reveals logic screenshots can't | ✓ Good |
 | Technology-neutral behavior specs | Rails is fundamentally different from React; behavior transfers, patterns don't | ✓ Good |
