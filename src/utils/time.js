@@ -33,7 +33,15 @@ export function formatTimeKey(hour) {
 }
 
 export function formatDate(date) {
-  return date.toISOString().split('T')[0];
+  // Use the LOCAL calendar date, not the UTC date. toISOString() returns UTC,
+  // which in any timezone ahead of UTC (e.g. QLD/AEST = UTC+10) lags the local
+  // date by one day during the first hours of the day (midnight-10am Brisbane).
+  // Every date label in the app is rendered local, so the key must be too,
+  // otherwise reads/writes land on the wrong day. See date-key off-by-one fix.
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 export function formatDisplayDate(date) {
