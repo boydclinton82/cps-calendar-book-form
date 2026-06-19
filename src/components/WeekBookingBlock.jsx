@@ -32,13 +32,11 @@ export function WeekBookingBlock({
   booking,
   startHour,
   date,
-  currentUser,
   onClick,
   users = [],  // Accept users from config
   useNSWTime = false,
 }) {
   const { user, duration } = booking;
-  const isOwn = user === currentUser;
 
   // Calculate how many hours have passed for today
   const now = new Date();
