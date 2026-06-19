@@ -42,8 +42,6 @@ export function BookingBlock({
   startHour,
   date,
   firstVisibleHour,  // First hour rendered by TimeStrip (single source of truth)
-  currentUser,
-  onCancel,
   onClick,
   users = [],  // Accept users from config
   useNSWTime = false,

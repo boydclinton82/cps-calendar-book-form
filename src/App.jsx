@@ -75,7 +75,7 @@ function App() {
     const status = getSlotStatus(todayKey, timeKey, currentHour);
 
     return status.status === 'available';
-  }, [getSlotStatus, bookings]);
+  }, [getSlotStatus]);
 
   // Navigation - 7 days for week view, 1 day for day view
   const handleNavigate = useCallback((direction) => {

@@ -2,9 +2,7 @@ import { isSlotPast, formatHour } from '../utils/time';
 import './TimeSlot.css';
 
 export function TimeSlot({
-  time,
   hour,
-  timeKey,
   date,
   slotStatus,
   isSelected,
